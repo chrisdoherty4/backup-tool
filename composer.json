@@ -4,7 +4,7 @@
     "type": "library",
     "keywords": [
     "backup",
-    "website"            
+    "backup-tool"            
     ],
     "license": "GNU LGPLv3",
     "authors": [
