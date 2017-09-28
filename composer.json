@@ -1,0 +1,29 @@
+{
+    "name": "chrisdoherty/backup-tool",
+    "description": "A common backup tool for website backups.",
+    "type": "library",
+    "keywords": [
+    "backup",
+    "website"            
+    ],
+    "license": "GNU LGPLv3",
+    "authors": [
+        {
+            "name": "Chris Doherty",
+            "email": "chris.doherty4@gmail.com",
+            "homepage": "http://chrisdoherty.io",
+            "role": "Software Engineer"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+    "php": "^7.0",
+        "phpunit/phpunit": "6.*",
+    "php-di/php-di": "@stable"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/"    
+        }
+    }
+}
