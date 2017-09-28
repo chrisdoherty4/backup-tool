@@ -19,7 +19,7 @@
     "require": {
     "php": "^7.0",
         "phpunit/phpunit": "6.*",
-    "php-di/php-di": "@stable"
+        "php-di/php-di": "@stable"
     },
     "autoload": {
         "psr-4": {
