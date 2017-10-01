@@ -17,15 +17,15 @@
     ],
     "minimum-stability": "stable",
     "require": {
-    "php": "^7.0",
+        "php": "^7.0",
         "phpunit/phpunit": "6.*",
-        "php-di/php-di": "@stable",
+        "pimple/pimple": "^3.0",
         "nicolab/php-ftp-client": "@stable",
         "cilex/cilex": "@stable"
     },
     "autoload": {
         "psr-4": {
-            "\\App": "src"
+            "Backup\\": "src/"
         }
     }
 }
