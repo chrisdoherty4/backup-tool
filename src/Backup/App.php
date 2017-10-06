@@ -17,5 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-$app = require_once "bootstrap.php";
+namespace Backup;
 
+class App extends \Cilex\Application
+{
+    
+}

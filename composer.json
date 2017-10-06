@@ -3,8 +3,8 @@
     "description": "A common backup tool for website backups.",
     "type": "library",
     "keywords": [
-    "backup",
-    "backup-tool"            
+        "backup",
+        "backup-tool"            
     ],
     "license": "GNU LGPLv3",
     "authors": [
@@ -25,7 +25,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Backup\\": "src/"
+            "": "src/"
         }
     }
 }

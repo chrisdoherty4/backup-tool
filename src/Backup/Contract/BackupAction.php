@@ -17,5 +17,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-$app = require_once "bootstrap.php";
+/**
+ * @namespace Backup
+ */
+namespace Backup\Contract;
 
+/**
+ * BackupAction
+ * 
+ * Interface defining an object that has a backup process associated with it.
+ */
+interface BackupAction {
+    /**
+     * The entry point for a backup. 
+     * 
+     * @param type $name If the backup can be given a name, this denotes the
+     *  name it'll be. 
+     */
+    public function backup($name);
+}
