@@ -1,6 +1,6 @@
 <?php
 
-/* 
+/*
  * Copyright (C) 2017 chrisdoherty
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,21 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-require_once __DIR__ . "../vendor/autoload.php";
+namespace Backup;
+
+use \Pimle\ServiceProviderInterface
 
 /**
- * Define the dependency manager (Pimple).
+ * Provides the Backup service application.
+ *
+ * @author chrisdoherty
  */
-$container = new Pimple\Psr11\Container(new Pimple\Container());
-
-/**
- * Register all the defined service providers from the 
- * src/config/service_providers.php configuration file.
- */
-$serviceProviders = require_once __DIR__ . "config/service_providers.php";
-
-foreach ($serviceProviders as $serviceProvider) {
-    $container->register($serviceProvider);
+class BackupServiceProvider implements ServiceProviderInterface
+{
+    public function register()
+    {
+        
+    }
 }
-
-return $container;

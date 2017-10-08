@@ -21,5 +21,6 @@
  * An array of service providers.
  */
 return [
-    
+    new \Backup\AppServiceProvider(),
+    new \Backup\CommandServiceProvider()
 ];
