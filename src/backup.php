@@ -17,5 +17,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-$app = require_once "bootstrap.php";
+require_once __DIR__ . "/../vendor/autoload.php";
 
+/**
+ * Define the dependency manager (Pimple).
+ */
+$app = new \Backup\App("Backup Tool");
+
+$app->run();

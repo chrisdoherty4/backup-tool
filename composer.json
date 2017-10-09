@@ -19,13 +19,12 @@
     "require": {
         "php": "^7.0",
         "phpunit/phpunit": "6.*",
-        "pimple/pimple": "^3.0",
         "nicolab/php-ftp-client": "@stable",
         "cilex/cilex": "@stable"
     },
     "autoload": {
         "psr-4": {
-            "": "src/"
+            "Backup\\": "src/"
         }
     }
 }
