@@ -19,6 +19,13 @@
 
 namespace Backup;
 
+/**
+ * App is the root of the backup tool application. It extends the 
+ * \Cilex\Application class giving it access to the \Pimple\Container
+ * container. 
+ *
+ * @author Chris Doherty <chris.doherty4@gmail.com>
+ */
 class App extends \Cilex\Application
 {
     

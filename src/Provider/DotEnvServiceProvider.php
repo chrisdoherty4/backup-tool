@@ -1,6 +1,6 @@
 <?php
 
-/* 
+/*
  * Copyright (C) 2017 chrisdoherty
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,13 +17,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-require_once __DIR__ . "/../vendor/autoload.php";
+namespace Backup\Provider;
+
+use Pimple\Container;
+use Pimple\ServiceProviderInterface
+use Dotenv\Dotenv;
 
 /**
- * Define the dependency manager (Pimple).
+ * Description of DotEnvServiceProvider
+ *
+ * @author chrisdoherty
  */
-$app = new \Backup\App("Backup Tool");
-
-$app->command(new \Backup\Command\CPanelBackupCommand());
-
-$app->run();
+class DotEnvServiceProvider implements ServiceProviderInterface
+{
+    /**
+     * Registers the Dotenv object with the pimple container.
+     * 
+     * @param Container $pimple
+     */
+    public function register(Container $pimple)
+    {
+        $pimple['env'] = function ($pimple) {
+            return new Dotenv($pimple['env_path']);
+        };
+    }
+}
