@@ -17,13 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Backup\Command;
+namespace Backup\Commands;
 
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Cilex\Provider\Console\Command;
-use Dotenv\Dotenv;
+use \Symfony\Component\Console\Input\InputInterface;
+use \Symfony\Component\Console\Output\OutputInterface;
+use \Cilex\Provider\Console\Command;
+use \GuzzleHttp\Client as HttpClient;
+use \GuzzleHttp\Psr7\Response as HttpResponse;
+use \PHLAK\Config\Config;
 
 /**
  * @class CPanelBackupCommand
@@ -36,12 +37,7 @@ use Dotenv\Dotenv;
  * @author Chris Doherty <chris.doherty4@gmail.com>
  */
 class CPanelBackupCommand extends Command
-{
-    /**
-     * The name of the argument for the environment path.
-     */
-    const ENV = "env_path";
-    
+{    
     /**
      * The guzzle client used to log in to the CPanel interface.
      * 
@@ -50,16 +46,28 @@ class CPanelBackupCommand extends Command
     private $httpClient;
     
     /**
+     *
+     * @var Config Object
+     */
+    private $cpanelConfig;
+    
+    /**
+     * The path of the website we're interfacing with. This is gathered from
+     * the response of our login request.
+     * 
+     * @var string
+     */
+    private $path;
+    
+    /**
      * Configures the command object.
      * 
      * @return void
      */
     public function configure() 
     {
-        $this->setName('backup:cpanel')
-                ->setDescription('A complete backup via cPanel')
-                ->addArgument(self::ENV, InputArgument::REQUIRED, 
-                        'Path to the dotenv file');
+        $this->setName('cpanel')
+            ->setDescription('A complete backup via cPanel');
     }
     
     /**
@@ -73,31 +81,50 @@ class CPanelBackupCommand extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln("<info>Loading environment.</info>");
-        
-        try {
-            $this->loadEnvironment($input);
-        }
-        catch(RunetimeException $e) {
-            $output->writeln("<error>Could not load environment variables.</>");
-        }
-        
         $output->writeln("<info>Logging in to CPanel interface.</>");
         
-        // Log in to the CPanel interface.
-        $this->httpClient = new \GuzzleHttp\Client([
-            'base_uri' => getenv('CPANEL_HOST'),
-            'cookies' => true,
-            'allow_redirects' => false
-        ]);
+        $response = $this->login();
+        $statusCode = $response->getStatusCode();
         
-        $response = $this->loginCpanel();
-        
-        if ($response->getStatusCode() == 200) {
-            $url = new \Purl\Url($response->getHeader('Location')[0]);
+        if ($statusCode >= 200 && $statusCode < 400) {
+            $output->writeln("<info>Successfully logged in.</>");
             
-            echo $url;
+            $this->path = $this->extractLoginResponsePath($response);
+            
+            $output->writeln("<info>Requesting backup to home directory.</>");
+            
+            if ($this->createBackup()->getStatusCode() == 200) {
+                $output->writeln("<info>Successfully requested backup.</>");
+            } else {
+                $output->writeln("<error>There was an error requesting a "
+                        . "backup.</>");
+            }
+        } else {
+            $output->writeln("<error>Failed to log in to CPanel. Check the "
+                    . "supplied credentials in the .env.cpanelbackup file.</>");
         }
+    }
+    
+    /**
+     * Sets the http client.
+     * 
+     * @param HttpClient $client
+     * @return void
+     */
+    public function setHttpClient(HttpClient $client) 
+    {
+        $this->httpClient = $client;
+    }
+    
+    /**
+     * Sets the cPanel configuration.
+     * 
+     * @param \PHLAX\Config\Config $config
+     * @return void
+     */
+    public function setCPanelConfig(Config $config) 
+    {
+        $this->cpanelConfig = $config;
     }
     
     /**
@@ -106,44 +133,63 @@ class CPanelBackupCommand extends Command
      * 
      * @return \GuzzleHttp\Response
      */
-    private function loginCpanel()
+    private function login()
     {
         return $this->httpClient->request('POST', '/login', [
             'form_params' => [
-                'user' => getenv('CPANEL_USER'),
-                'pass' => getenv('CPANEL_PASS'),
+                'user' => $this->cpanelConfig->get('username'),
+                'pass' => $this->cpanelConfig->get('password'),
                 'goto_uri' => '/'
             ],
-            'debug' => true
+            'debug' => $this->cpanelConfig->get('debug')
         ]);
     }
     
     /**
-     * Submits the CPanel backup request and asks CPanel to push te backup
+     * Submits the CPanel backup request and asks CPanel to push the backup
      * to an FTP server.
      * 
      * @return \GuzzleHttp\Response
      */
-    private function submitBackupRequest()
+    private function createBackup()
     {
-        
+        return $this->httpClient->request(
+            'POST', 
+            $this->createPath('backup/wizard-dofullbackup.html'),
+            [
+                'form_params' => [
+                    'dest' => 'homedir',
+                    'email_radio' => 0
+                ],
+                'debug' => $this->cpanelConfig->get('debug')
+            ]);
     }
     
     /**
-     * Loads the envionrment from the .env file defined for cpanel backup.
+     * Retrieves a full path including the extension retrieved from the initial
+     * response when we logged into CPanel.
      * 
-     * @param InputInterface $input The console Input interface.
-     * @return void
+     * @param string $extension
+     * @return string
      */
-    private function loadEnvironment(InputInterface $input)
+    private function createPath($extension)
     {
-        $env = new Dotenv($input->getArgument(self::ENV), 'env.cpanelbackup');
-        
-        $env->required('CPANEL_HOST')->notEmpty();
-        $env->required('CPANEL_USER')->notEmpty();
-        $env->required('CPANEL_PASS');
-        $env->required('FTP_HOST')->notEmpty();
-        $env->required('FTP_USER')->notEmpty();
-        $env->required('FTP_PASS');
+        return sprintf("%s/%s", $this->path, $extension);
+    }
+    
+    /**
+     * This function expects the initial response from a CPanel login as the 
+     * redirect or location will merely be to the index.php page. This function
+     * extracts the path excluding the index.php segment so we can use it when
+     * submitting a request for backup. 
+     * 
+     * @param HttpResponse $response The http response received from a CPanel 
+     *  login.
+     * @return string
+     */
+    private function extractLoginResponsePath(HttpResponse $response) 
+    {
+        $path = (new \Purl\Url($response->getHeader('Location')[0]))->path;
+        return substr($path, 0, strrpos($path, "/"));
     }
 }

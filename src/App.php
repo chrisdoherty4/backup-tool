@@ -19,6 +19,8 @@
 
 namespace Backup;
 
+use \Cilex\Application as CommandConsole;
+
 /**
  * App is the root of the backup tool application. It extends the 
  * \Cilex\Application class giving it access to the \Pimple\Container
@@ -26,7 +28,20 @@ namespace Backup;
  *
  * @author Chris Doherty <chris.doherty4@gmail.com>
  */
-class App extends \Cilex\Application
+class App extends CommandConsole
 {
-    
+    /**
+     * Registers an array of service providers.
+     * 
+     * @param array $providers
+     * @return $this
+     */
+    public function registerMultiple(array $providers) 
+    {
+        foreach ($providers as $provider) {
+            $this->register($provider);
+        }
+        
+        return $this;
+    }
 }

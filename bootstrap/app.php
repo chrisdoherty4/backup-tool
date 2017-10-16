@@ -20,10 +20,55 @@
 require_once __DIR__ . "/../vendor/autoload.php";
 
 /**
+ * ---------------------------------------------------------------------------
+ * Load Environment
+ * ---------------------------------------------------------------------------
+ * 
+ * Load the environment variables.
+ */
+try {
+    (new \Dotenv\Dotenv(__DIR__ . "/../"))->load();
+} catch (\Dotenv\Exception\InvalidPathException $ex) {
+    // Environment not loaded.
+}
+
+/**
+ * ---------------------------------------------------------------------------
+ * Create Console Application
+ * ---------------------------------------------------------------------------
+ * 
  * Define the dependency manager (Pimple).
  */
 $app = new \Backup\App("Backup Tool");
 
-$app->command(new \Backup\Command\CPanelBackupCommand());
+/**
+ * ---------------------------------------------------------------------------
+ * Register Service Providers
+ * ---------------------------------------------------------------------------
+ * 
+ * Register our service providers.
+ */
+$app->registerMultiple(require config_path('/providers.php'));
 
-$app->run();
+/**
+ * ---------------------------------------------------------------------------
+ * Boot App
+ * ---------------------------------------------------------------------------
+ * 
+ * Now we want to boot the application so the service providers register each 
+ * of their respective services.
+ */
+$app->boot();
+
+/**
+ * ---------------------------------------------------------------------------
+ * Command Registration
+ * ---------------------------------------------------------------------------
+ * 
+ * Lets register the commands we expet for the application. 
+ */
+$app->command($app['cpanel_backup_command']);
+//$app->command($app['ftp_transfer_command']);
+//$app->command($app['target_cleanup_command']);
+
+return $app;

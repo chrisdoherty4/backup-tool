@@ -1,6 +1,6 @@
 <?php
 
-/*
+/* 
  * Copyright (C) 2017 chrisdoherty
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,34 +19,30 @@
 
 namespace Backup\Providers;
 
-use \Pimple\Container;
 use \Pimple\ServiceProviderInterface;
-use \GuzzleHttp\Client as HttpClient;
-use \PHLAK\Config\Config;
+use \Pimple\Container;
+use \Backup\Commands\CPanelBackupCommand;
 
 /**
- * @class HttpServiceProvider
- * Registers the HTTP Client service.
- *
- * @author Chris Dohety <chris.doherty4@gmail.com>
+ * @class CommandsServiceProvider
+ * Registers the commands we want to use.
+ * 
+ * @author Chris Doherty <chris.doherty4@gmail.com>
  */
-class HttpServiceProvider implements ServiceProviderInterface
+class CommandsServiceProvider implements ServiceProviderInterface
 {
     /**
      * {@inheritDoc}
      */
     public function register(Container $c) 
     {
-        $c['http_client_config'] = function (Container $c) {
-            return new Config(config_path("/cpanel.php"));
-        };
-        
-        $c['http_client'] = function (Container $c) {
-            return new HttpClient([
-                'base_uri' => $c['http_client_config']->get('uri'),
-                'cookies' => true,
-                'allow_redirects' => false
-            ]);
+        $c['cpanel_backup_command'] = function (Container $c) {
+            $command = new CPanelBackupCommand();
+            
+            $command->setCPanelConfig($c['http_client_config']);
+            $command->setHttpClient($c['http_client']);
+            
+            return $command;
         };
     }
 }
