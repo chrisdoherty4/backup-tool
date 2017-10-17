@@ -11,15 +11,4 @@
  */
 $app = require 'bootstrap/app.php';
 
-/**
- * ---------------------------------------------------------------------------
- * Command Registration
- * ---------------------------------------------------------------------------
- * 
- * Lets register the commands we expet for the application. 
- */
-$app->command($app['\Backup\Commands\CPanelBackup']);
-$app->command($app['\Backup\Commands\FtpPush']);
-
-
 $app->run();

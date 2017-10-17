@@ -19,9 +19,9 @@
 
 namespace Backup\Commands;
 
+use \Cilex\Provider\Console\Command;
 use \Symfony\Component\Console\Input\InputInterface;
 use \Symfony\Component\Console\Output\OutputInterface;
-use \Cilex\Provider\Console\Command;
 use \GuzzleHttp\Client as HttpClient;
 use \GuzzleHttp\Psr7\Response as HttpResponse;
 use \PHLAK\Config\Config;
@@ -58,13 +58,28 @@ class CPanelBackup extends Command
      * @var string
      */
     private $path;
+
+    /**
+     * @param Config $config
+     * @param HttpClient $client
+     */
+    public function __construct(
+        Config $config,
+        HttpClient $client
+    )
+    {
+        parent::__construct();
+        
+        $this->cpanelConfig = $config;
+        $this->httpClient = $client;
+    }
     
     /**
      * Configures the command object.
      * 
      * @return void
      */
-    public function configure() 
+    public function configure()
     {
         $this->setName('cpanel')
             ->setDescription('A complete backup via cPanel that stashes the'
@@ -105,28 +120,6 @@ class CPanelBackup extends Command
             $output->writeln("<error>Failed to log in to CPanel. Check the "
                     . "supplied credentials in the .env.cpanelbackup file.</>");
         }
-    }
-    
-    /**
-     * Sets the http client.
-     * 
-     * @param HttpClient $client
-     * @return void
-     */
-    public function setHttpClient(HttpClient $client) 
-    {
-        $this->httpClient = $client;
-    }
-    
-    /**
-     * Sets the cPanel configuration.
-     * 
-     * @param \PHLAX\Config\Config $config
-     * @return void
-     */
-    public function setCPanelConfig(Config $config) 
-    {
-        $this->cpanelConfig = $config;
     }
     
     /**

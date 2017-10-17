@@ -40,7 +40,8 @@ try {
  * Create Console Application
  * ---------------------------------------------------------------------------
  * 
- * Define the dependency manager (Pimple).
+ * Define the console application. This is essentially a Cilex app that feeds
+ * off Symfony with some added magic.
  */
 $app = new \Backup\App("Backup Tool");
 
@@ -60,9 +61,20 @@ $app->registerMultiple(require base_path('/bootstrap/providers.php'));
  * ---------------------------------------------------------------------------
  * 
  * Now we want to boot the application so the service providers register each 
- * of their respective services.
+ * of their respective services. This is important as we're adding commands
+ * next that have dependencies.
  */
 $app->boot();
+
+/**
+ * ---------------------------------------------------------------------------
+ * Command Registration
+ * ---------------------------------------------------------------------------
+ *
+ * Lets register the commands we expet for the application.
+ */
+$app->command($app['\Backup\Commands\CPanelBackup']);
+$app->command($app['\Backup\Commands\FtpPush']);
 
 
 return $app;

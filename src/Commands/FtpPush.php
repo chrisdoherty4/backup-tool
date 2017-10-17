@@ -48,25 +48,17 @@ class FtpPush extends Command
     private $client;
 
     /**
-     * Initialised indicator
-     * 
-     * @var bool
-     */
-    private $init = false;
-
-    /**
      * Initialises command with appropriate dependencies.
      * 
      * @param Config $config
      * @param FtpClient $client
      */
-    public function init(Config $config, FtpClient $client)
+    public function __construct(Config $config, FtpClient $client)
     {
+        parent::__construct();
+        
         $this->config = $config;
         $this->client = $client;
-        $this->init = true;
-
-        return $this;
     }
 
     /**
@@ -91,11 +83,6 @@ class FtpPush extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        if (!$this->init) {
-            throw new \RuntimeException("Command executed without being "
-                . "initialised");
-        }
-
         
     }
 }
