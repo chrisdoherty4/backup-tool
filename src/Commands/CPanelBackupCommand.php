@@ -67,7 +67,8 @@ class CPanelBackupCommand extends Command
     public function configure() 
     {
         $this->setName('cpanel')
-            ->setDescription('A complete backup via cPanel');
+            ->setDescription('A complete backup via cPanel that stashes the'
+                . ' backup in the home directory.');
     }
     
     /**

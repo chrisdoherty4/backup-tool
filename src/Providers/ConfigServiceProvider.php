@@ -1,6 +1,6 @@
 <?php
 
-/*
+/* 
  * Copyright (C) 2017 chrisdoherty
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,24 +19,31 @@
 
 namespace Backup\Providers;
 
-use \Pimple\Container;
 use \Pimple\ServiceProviderInterface;
-use \GuzzleHttp\Client as HttpClient;
+use \Pimple\Container;
+use \PHLAK\Config\Config;
 
 /**
- * @class HttpServiceProvider
- * @author Chris Dohety <chris.doherty4@gmail.com>
+ * @class ConfigServiceProvider
+ * @author Chris Doherty <chris.doherty4@gmail.com>
  */
-class HttpServiceProvider implements ServiceProviderInterface
+class ConfigServiceProvider implements ServiceProviderInterface
 {
     public function register(Container $c) 
-    {        
-        $c['http_client'] = function (Container $c) {
-            return new HttpClient([
-                'base_uri' => $c['cpanel_config']->get('uri'),
-                'cookies' => true,
-                'allow_redirects' => false
-            ]);
-        };
+    {
+        // Read all configuration files. 
+        $configPath = config_path();
+        $files = array_diff(scandir($configPath), ['.', '..']);
+        
+        foreach ($files as $file) {
+            $fileName = substr($file, 0, strrpos($file, '.'));
+            
+            $c[$fileName.'_config'] = function (Container $c) use (
+                    $file, 
+                    $configPath
+                ) {
+                return new Config($configPath."/".$file);
+            };
+        }
     }
 }

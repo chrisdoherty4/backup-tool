@@ -17,25 +17,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-return [
-    /**
-     * The host of the FTP server to push to. This can be a domain name or 
-     * URI.
-     */
-    'host' => env('FTP_TARGET_HOST'),
-    
-    /**
-     * The port of the FTP server.
-     */
-    'port' => env('FTP_TARGET_PORT'),
-    
-    /**
-     * The username to log in with.
-     */
-    'username' => env('FTP_TARGET_USER'),
-    
-    /**
-     * The password for the username.
-     */
-    'password' => env('FTP_TARGET_PASS')
-];
+namespace Backup\Providers;
+
+use \Pimple\ServiceProviderInterface;
+use \Pimple\Container;
+use \FtpClient\FtpClient;
+
+/**
+ * @class FtpServiceProvider
+ * @author Chris Doherty <chris.doherty4@gmail.com>
+ */
+class FtpServiceProvider implements ServiceProviderInterface
+{
+    public function register(Container $c) 
+    {        
+        $c['ftp_client'] = $c->factory(function (Container $c) {
+            return new FtpClient();
+        });
+    }
+}

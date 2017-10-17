@@ -39,7 +39,7 @@ class CommandsServiceProvider implements ServiceProviderInterface
         $c['cpanel_backup_command'] = function (Container $c) {
             $command = new CPanelBackupCommand();
             
-            $command->setCPanelConfig($c['http_client_config']);
+            $command->setCPanelConfig($c['cpanel_config']);
             $command->setHttpClient($c['http_client']);
             
             return $command;

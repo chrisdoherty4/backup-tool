@@ -18,6 +18,8 @@
  */
 
 return [
+    new \Backup\Providers\ConfigServiceProvider(),
     new \Backup\Providers\HttpServiceProvider(),
+    new \Backup\Providers\FtpServiceProvider(),
     new \Backup\Providers\CommandsServiceProvider()
 ];

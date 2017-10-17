@@ -1,6 +1,26 @@
 #!/usr/bin/env php
 <?php
 
+/**
+ * ---------------------------------------------------------------------------
+ * Init Boostrap
+ * ---------------------------------------------------------------------------
+ * 
+ * Run boostrap application to set up the application before registering 
+ * commands and running a command.
+ */
 $app = require 'bootstrap/app.php';
+
+/**
+ * ---------------------------------------------------------------------------
+ * Command Registration
+ * ---------------------------------------------------------------------------
+ * 
+ * Lets register the commands we expet for the application. 
+ */
+$app->command($app['cpanel_backup_command']);
+//$app->command($app['ftp_transfer_command']);
+//$app->command($app['target_cleanup_command']);
+
 
 $app->run();

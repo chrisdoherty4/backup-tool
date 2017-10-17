@@ -24,7 +24,10 @@ require_once __DIR__ . "/../vendor/autoload.php";
  * Load Environment
  * ---------------------------------------------------------------------------
  * 
- * Load the environment variables.
+ * Load environment variables. These are used in the configuration files and 
+ * accessed via the <code>env()</code> function.
+ * 
+ * @todo what shall we do if an exception is thrown?
  */
 try {
     (new \Dotenv\Dotenv(__DIR__ . "/../"))->load();
@@ -46,9 +49,10 @@ $app = new \Backup\App("Backup Tool");
  * Register Service Providers
  * ---------------------------------------------------------------------------
  * 
- * Register our service providers.
+ * Register our service providers. The service providers are ordered such 
+ * that dependencies are fulfilled.
  */
-$app->registerMultiple(require config_path('/providers.php'));
+$app->registerMultiple(require base_path('/bootstrap/providers.php'));
 
 /**
  * ---------------------------------------------------------------------------
@@ -60,15 +64,5 @@ $app->registerMultiple(require config_path('/providers.php'));
  */
 $app->boot();
 
-/**
- * ---------------------------------------------------------------------------
- * Command Registration
- * ---------------------------------------------------------------------------
- * 
- * Lets register the commands we expet for the application. 
- */
-$app->command($app['cpanel_backup_command']);
-//$app->command($app['ftp_transfer_command']);
-//$app->command($app['target_cleanup_command']);
 
 return $app;
