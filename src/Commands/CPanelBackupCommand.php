@@ -95,7 +95,8 @@ class CPanelBackupCommand extends Command
             $output->writeln("<info>Requesting backup to home directory.</>");
             
             if ($this->createBackup()->getStatusCode() == 200) {
-                $output->writeln("<info>Successfully requested backup.</>");
+                $output->writeln("<info>Successfully requested backup. Backups"
+                    . " take time to complete so may not appear instantly.</>");
             } else {
                 $output->writeln("<error>There was an error requesting a "
                         . "backup.</>");

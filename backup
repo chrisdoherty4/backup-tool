@@ -18,9 +18,9 @@ $app = require 'bootstrap/app.php';
  * 
  * Lets register the commands we expet for the application. 
  */
-$app->command($app['cpanel_backup_command']);
-//$app->command($app['ftp_transfer_command']);
-//$app->command($app['target_cleanup_command']);
+$app->command($app['\Backup\Command\CPanelBackupCommand']);
+//$app->command($app[]);
+//$app->command($app[]);
 
 
 $app->run();

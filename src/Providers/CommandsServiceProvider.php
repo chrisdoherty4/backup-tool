@@ -36,7 +36,7 @@ class CommandsServiceProvider implements ServiceProviderInterface
      */
     public function register(Container $c) 
     {
-        $c['cpanel_backup_command'] = function (Container $c) {
+        $c['\Backup\Command\CPanelBackupCommand'] = function (Container $c) {
             $command = new CPanelBackupCommand();
             
             $command->setCPanelConfig($c['cpanel_config']);
