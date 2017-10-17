@@ -36,7 +36,7 @@ use \PHLAK\Config\Config;
  *
  * @author Chris Doherty <chris.doherty4@gmail.com>
  */
-class CPanelBackupCommand extends Command
+class CPanelBackup extends Command
 {    
     /**
      * The guzzle client used to log in to the CPanel interface.

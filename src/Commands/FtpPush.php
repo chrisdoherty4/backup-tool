@@ -30,7 +30,7 @@ use \FtpClient\FtpClient;
  *
  * @author Chris Doherty <chris.doherty4@gmail.com>
  */
-class FtpPushCommand extends Command
+class FtpPush extends Command
 {
     /**
      * The target FTP Server configuration.
@@ -76,7 +76,7 @@ class FtpPushCommand extends Command
     {
         $this->setName("ftppush")
             ->setDescription("Push a backup to an FTP Server.")
-            ->setArgument('backup_path', InputArgument::REQUIRED, 'The fully '
+            ->addArgument('backup_path', InputArgument::REQUIRED, 'The fully '
                 . 'qualified backup path. The filename can be in regex '
                 . 'format.');
     }
