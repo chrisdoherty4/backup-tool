@@ -18,9 +18,8 @@ $app = require 'bootstrap/app.php';
  * 
  * Lets register the commands we expet for the application. 
  */
-$app->command($app['\Backup\Command\CPanelBackupCommand']);
-//$app->command($app[]);
-//$app->command($app[]);
+$app->command($app['\Backup\Commands\CPanelBackupCommand']);
+$app->command($app['\Backup\Commands\FtpPushCommand']);
 
 
 $app->run();

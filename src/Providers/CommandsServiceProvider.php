@@ -22,27 +22,28 @@ namespace Backup\Providers;
 use \Pimple\ServiceProviderInterface;
 use \Pimple\Container;
 use \Backup\Commands\CPanelBackupCommand;
+use \Backup\Commands\FtpPushCommand;
 
 /**
  * @class CommandsServiceProvider
- * Registers the commands we want to use.
- * 
  * @author Chris Doherty <chris.doherty4@gmail.com>
  */
 class CommandsServiceProvider implements ServiceProviderInterface
 {
-    /**
-     * {@inheritDoc}
-     */
     public function register(Container $c) 
     {
-        $c['\Backup\Command\CPanelBackupCommand'] = function (Container $c) {
+        $c['\Backup\Commands\CPanelBackupCommand'] = function (Container $c) {
             $command = new CPanelBackupCommand();
             
             $command->setCPanelConfig($c['cpanel_config']);
             $command->setHttpClient($c['http_client']);
             
             return $command;
+        };
+
+        $c['\Backup\Commands\FtpPushCommand'] = function (Container $c) {
+            return (new FtpPushCommand())
+                ->init($c['ftp_push_config'], $c['ftp_client']);
         };
     }
 }
