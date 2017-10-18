@@ -97,6 +97,10 @@ class CPanelBackup extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
+        $output->writeln("==================================================");
+        $output->writeln("CPanel Backup Command");
+        $output->writeln("==================================================");
+        
         $output->writeln("<info>Logging in to CPanel interface.</>");
         
         $response = $this->login();

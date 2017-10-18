@@ -24,6 +24,7 @@ use \Symfony\Component\Console\Input\InputArgument;
 use \Cilex\Provider\Console\Command;
 use \PHLAK\Config\Config;
 use \FtpClient\FtpClient;
+use \FtpClient\FtpException;
 
 /**
  * @class FtpPushCommand
@@ -83,6 +84,103 @@ class FtpPush extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
+        $output->writeln("==================================================");
+        $output->writeln("FTP Push Command");
+        $output->writeln("==================================================");
         
+        $path = $input->getArgument('backup_path');
+        
+        $backups = $this->getBackups($path);
+        
+        $total = count($backups);
+
+        $output->writeln(
+            "<info>Found ".count($backups)." backup(s).</>");
+
+        if (!$total) {
+            $output->writeln("<comment>If you're expecting backups to be present, "
+                . "check the path (".$path.").</>");
+        }
+
+        if ($total) {
+            $output->writeln("<info>Connecting and logging in to FTP "
+                . "server.</>");
+
+            try {
+                $this->client
+                    ->connect(
+                        $this->config->get('host'),
+                        false,
+                        $this->config->get('port')
+                    )
+                    ->login(
+                        $this->config->get('username'),
+                        $this->config->get('password')
+                    );
+            }
+            catch (FtpException $e) {
+                $output->writeln("<error>ERROR: ".$e->getMessage()."</>");
+            }
+
+            if ($this->client->getConnection() !== false) {
+
+                $output->writeln("<info>Transferring ".$total." backup(s)</>");
+
+                $this->client->pasv($this->config->get('passive'));
+
+                $complete = $this->pushBackups($backups);
+
+                if ($complete == $total) {
+                    $output->writeln("<info>Successfully transfered all "
+                        . "backups</>");
+                } else {
+                    $output->writeln("<error>Failed to transfer " .
+                        ($total - $complete) . "backup(s).</>");
+                }
+            }
+        }
+    }
+
+    /**
+     * Retrieves all the files for transfer based on the backup path defined
+     * in the environment file.
+     * 
+     * @return array An array of files that match the src_path string.
+     */
+    private function getBackups($backupPath)
+    {
+        $backups = array_values(glob($backupPath));
+
+        $keys = array();
+
+        foreach ($backups as $backup) {
+            $keys[] = pathinfo($backup)['basename'];
+        }
+
+        return array_combine($keys, array_values($backups));
+    }
+
+    /**
+     * Pushes the backups found to the FTP server.
+     * 
+     * @param array $backups An array of backup file paths.
+     * @return int The number of successful transfers.
+     */
+    private function pushBackups($backups)
+    {
+        $successful = 0;
+
+        foreach ($backups as $file => $path) {
+            try {
+                $this->client->put($file, $path, FTP_ASCII);
+                $successful+= 1;
+                unlink($path);
+            }
+            catch (FtpException $e) {
+                // Do nothing, we don't really care much.
+            }
+        }
+
+        return $successful;
     }
 }

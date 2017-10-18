@@ -37,5 +37,10 @@ return [
     /**
      * The password for the username.
      */
-    'password' => env('FTP_TARGET_PASS')
+    'password' => env('FTP_TARGET_PASS'),
+
+    /**
+     * Set passive transfer mode on or off.
+     */
+    'passive' => true
 ];
