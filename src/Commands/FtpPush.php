@@ -106,8 +106,10 @@ class FtpPush extends Command
             $output->writeln("<info>Connecting and logging in to FTP "
                 . "server.</>");
 
+            $connected = true;
+
             try {
-                $this->client
+                @$this->client
                     ->connect(
                         $this->config->get('host'),
                         false,
@@ -120,9 +122,10 @@ class FtpPush extends Command
             }
             catch (FtpException $e) {
                 $output->writeln("<error>ERROR: ".$e->getMessage()."</>");
+                $connected = false;
             }
 
-            if ($this->client->getConnection() !== false) {
+            if ($connected !== false) {
 
                 $output->writeln("<info>Transferring ".$total." backup(s)</>");
 
