@@ -1,6 +1,6 @@
-# Project Title
+# Backup Tool
 
-One Paragraph of project description goes here
+A simple backup tool used to create and store backups on different platforms. The program is used on a command line and typically invoked via a crontab. 
 
 ## Getting Started
 
@@ -8,67 +8,48 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-What things you need to install the software and how to install them
+To contribute you require `composer` and `php version >=5.6`. Checkout the repository and run composer.
 
 ```
-Give examples
+git clone https://github.com/chrisdoherty4/backup-tool.git backup-tool
+cd backup-tool
+composer install
 ```
 
 ### Installing
 
-A step by step series of examples that tell you have to get a development env running
+There are no specfic steps for getting a development environment setup. The system is a command line utility that is invoked using the `backup` executable. The system is built on top of [Cilex](https://github.com/Cilex/Cilex) with commands called the same way.
 
-Say what the step will be
-
-```
-Give the example
-```
-
-And repeat
+For the application to run, the `.env` file needs to be completed providing a configuration for cPanel. See [.env.example](.env.example) for details.
 
 ```
-until finished
+php backup cpanel
 ```
-
-End with an example of getting some data out of the system or using it for a little demo
 
 ## Running the tests
 
-Explain how to run the automated tests for this system
-
-### Break down into end to end tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-### And coding style tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
+We are yet to define tests - stay tuned.
 
 ## Deployment
 
-Add additional notes about how to deploy this on a live system
+1. Install via favourite method onto target.
+1. Run `composer install`.
+1. Copy and configure `.env.example`.
+1. Set up a crontab to run as desired
 
-## Built With
+Suggested crontab command: 
 
-* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
-* [Maven](https://maven.apache.org/) - Dependency Management
-* [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
+```
+/directory/to/backup cpanel > "/var/logs/$(date '+\%Y\%m\%d')_backup_cpanel" 2>&1
+```
 
 ## Contributing
 
-Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
+Please read [CONTRIBUTING.md]() for details on our code of conduct, and the process for submitting pull requests to us.
 
 ## Versioning
 
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
+We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/chrisdoherty4/backup-tool/tags). 
 
 ## Authors
 
@@ -78,12 +59,5 @@ See also the list of [contributors](https://github.com/your/project/contributors
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
-
-## Acknowledgments
-
-* Hat tip to anyone who's code was used
-* Inspiration
-* etc
-
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
 
