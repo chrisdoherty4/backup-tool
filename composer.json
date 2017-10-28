@@ -33,7 +33,7 @@
             "src/Helpers/helpers.php"
         ],
         "psr-4": {
-            "Backup\\": "src/"
+            "Backup\\": "src/Backup"
         }
     }
 }
