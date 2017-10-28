@@ -1,6 +1,6 @@
 <?php
 /* 
- * Copyright (C) 2017 chrisdoherty
+ * Copyright (C) 2017 Chris Doherty
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
