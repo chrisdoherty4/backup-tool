@@ -21,7 +21,7 @@ return [
     /**
      * The URI for the cPanel interface. 
      */
-    'uri' => env('CPANEL_URI'),
+    'uri' => env('CPANEL_HOSTNAME'),
     
     /**
      * The username used to log in to cPanel.
