@@ -37,10 +37,10 @@ We are yet to define tests - stay tuned.
 1. Copy and configure `.env.example`.
 1. Set up a crontab to run as desired
 
-Suggested crontab command: 
+Suggested crontab: 
 
 ```
-/directory/to/backup cpanel > "/var/logs/$(date '+\%Y\%m\%d')_backup_cpanel" 2>&1
+0 0 * * * /directory/to/backup cpanel > "/var/logs/$(date '+\%Y\%m\%d')_backup_cpanel" 2>&1
 ```
 
 ## Contributing
