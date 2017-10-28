@@ -21,7 +21,6 @@ namespace Backup\Commands;
 use \Symfony\Component\Console\Input\InputInterface;
 use \Symfony\Component\Console\Output\OutputInterface;
 use \Symfony\Component\Console\Input\InputArgument;
-use \Cilex\Provider\Console\Command;
 use \PHLAK\Config\Config;
 use \FtpClient\FtpClient;
 use \FtpClient\FtpException;
@@ -31,7 +30,7 @@ use \FtpClient\FtpException;
  *
  * @author Chris Doherty <chris.doherty4@gmail.com>
  */
-class FtpPush extends Command
+class FtpPush extends AbstractCommand
 {
     /**
      * The target FTP Server configuration.
@@ -68,6 +67,7 @@ class FtpPush extends Command
     public function configure()
     {
         $this->setName("ftppush")
+            ->setTitle('FTP Push Command')
             ->setDescription("Push a backup to an FTP Server.")
             ->addArgument('backup_path', InputArgument::REQUIRED, 'The fully '
                 . 'qualified backup path. The filename can be in regex '
@@ -84,9 +84,7 @@ class FtpPush extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln("==================================================");
-        $output->writeln("FTP Push Command");
-        $output->writeln("==================================================");
+        $output->writeln($this->getHeader());
         
         $path = $input->getArgument('backup_path');
         
