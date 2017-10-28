@@ -19,7 +19,6 @@
 
 namespace Backup\Commands;
 
-use \Cilex\Provider\Console\Command;
 use \Symfony\Component\Console\Input\InputInterface;
 use \Symfony\Component\Console\Output\OutputInterface;
 use \GuzzleHttp\Client as HttpClient;
@@ -27,16 +26,16 @@ use \GuzzleHttp\Psr7\Response as HttpResponse;
 use \PHLAK\Config\Config;
 
 /**
- * @class CPanelBackupCommand
- * Backs up a website via the CPanel full website backup feature. The backup
- * is pushed to an FTP server once complete. All CPanel and FTP configuration
- * is achieved through the Dotenv file located at a user defined location. 
+ * @class CPanelBackup
+ * Backs up a website via the CPanel full website backup feature. All CPanel 
+ * configuration is achieved through the Dotenv file located at a user defined
+ * location.
  * 
  * The command expects a single argument, the Dotenv directory path. 
  *
  * @author Chris Doherty <chris.doherty4@gmail.com>
  */
-class CPanelBackup extends Command
+class CPanelBackup extends AbstractCommand
 {    
     /**
      * The guzzle client used to log in to the CPanel interface.
@@ -82,14 +81,13 @@ class CPanelBackup extends Command
     public function configure()
     {
         $this->setName('cpanel')
+            ->setTitle('CPanel Backup Command')
             ->setDescription('A complete backup via cPanel that stashes the'
                 . ' backup in the home directory.');
     }
     
     /**
-     * Loads the cpanel backup environment before logging in and making a 
-     * backup request. The backup request is only sent to an FTP server 
-     * defined in the environment configuration. 
+     * Logs in to cPanel and requests a backup be created to the home directory.
      * 
      * @param InputInterface $input Console input interface.
      * @param OutputInterface $output Console output interface.
@@ -97,9 +95,7 @@ class CPanelBackup extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln("==================================================");
-        $output->writeln("CPanel Backup Command");
-        $output->writeln("==================================================");
+        $output->writeln($this->getCommandHeader());
         
         $output->writeln("<info>Logging in to CPanel interface.</>");
         

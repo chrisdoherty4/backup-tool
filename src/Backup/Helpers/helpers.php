@@ -64,7 +64,7 @@ if (!function_exists('base_path')) {
      */
     function base_path($path = "") 
     {   
-        $path = realpath(__DIR__ . '/../..' . rtrim($path, '/'));
+        $path = realpath(__DIR__ . '/../../..' . rtrim($path, '/'));
         
         if ($path === false) {
             throw new \RuntimeException("Path does not exist.");

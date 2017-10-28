@@ -20,7 +20,12 @@
 namespace Backup\Commands;
 
 use \Cilex\Provider\Console\Command;
+use \Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * @class AbstractCommand
+ * A command abstraction handling common functionality across commands.
+ */
 abstract class AbstractCommand extends Command
 {
     /**
@@ -35,9 +40,56 @@ abstract class AbstractCommand extends Command
      * 
      * @param string $title
      */
-    public function __construct($title)
+    public function __construct($title = null)
+    {
+        parent::__construct();
+        
+        $this->setTitle($title);
+    }
+
+    /**
+     * Sets the command title.
+     * 
+     * @param strnig $title
+     */
+    public function setTitle($title)
     {
         $this->title = $title;
+    }
+
+    /**
+     * Retrieves the command title.
+     * 
+     * @return string
+     */
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+    /**
+     * Retrieves a formatted command header.
+     * 
+     * @return string
+     */
+    public function getCommandHeader()
+    {
+        $title = "==================================================";
+        $title.= $this->title;
+        $title.= (new DateTime())->format('Y-m-d T H:i:sP');
+        $title.= "==================================================";
+
+        return $title;
+    }
+
+    /**
+     * Writes the command header to the console.
+     * 
+     * @param OutputInterface $output
+     */
+    public function writeTitle(OutputInterface $output)
+    {
+        $output->writeln($this->getCommandHeader());
     }
 }
 
