@@ -36,25 +36,16 @@ abstract class AbstractCommand extends Command
     private $title = null;
 
     /**
-     * Constructor.
-     * 
-     * @param string $title
-     */
-    public function __construct($title = null)
-    {
-        parent::__construct();
-        
-        $this->setTitle($title);
-    }
-
-    /**
      * Sets the command title.
      * 
      * @param strnig $title
+     * @return $this
      */
     public function setTitle($title)
     {
         $this->title = $title;
+
+        return $this;
     }
 
     /**
@@ -72,14 +63,15 @@ abstract class AbstractCommand extends Command
      * 
      * @return string
      */
-    public function getCommandHeader()
+    public function getHeader()
     {
-        $title = "==================================================";
-        $title.= $this->title;
-        $title.= (new DateTime())->format('Y-m-d T H:i:sP');
-        $title.= "==================================================";
+        $header = sprintf("%s\n%s\n%s\n%s\n",
+            "==================================================",
+            $this->getTitle(),
+            (new \DateTime())->format('Y-m-d T H:i:sP'),
+            "==================================================");
 
-        return $title;
+        return $header;
     }
 
     /**
@@ -87,7 +79,7 @@ abstract class AbstractCommand extends Command
      * 
      * @param OutputInterface $output
      */
-    public function writeTitle(OutputInterface $output)
+    public function writeHeader(OutputInterface $output)
     {
         $output->writeln($this->getCommandHeader());
     }

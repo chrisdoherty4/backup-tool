@@ -30,7 +30,7 @@
     },
     "autoload": {
         "files": [
-            "src/Helpers/helpers.php"
+            "src/Backup/Helpers/helpers.php"
         ],
         "psr-4": {
             "Backup\\": "src/Backup"

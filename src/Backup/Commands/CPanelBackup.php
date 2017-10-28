@@ -95,7 +95,7 @@ class CPanelBackup extends AbstractCommand
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln($this->getCommandHeader());
+        $output->writeln($this->getHeader());
         
         $output->writeln("<info>Logging in to CPanel interface.</>");
         
