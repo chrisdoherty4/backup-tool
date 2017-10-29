@@ -38,7 +38,7 @@ class ConfigServiceProvider implements ServiceProviderInterface
         foreach ($files as $file) {
             $fileName = substr($file, 0, strrpos($file, '.'));
             
-            $c[$fileName.'_config'] = function (Container $c) use (
+            $c['config.'.$fileName] = function (Container $c) use (
                     $file, 
                     $configPath
                 ) {

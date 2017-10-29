@@ -33,13 +33,13 @@ class CommandsServiceProvider implements ServiceProviderInterface
     public function register(Container $c) 
     {
         $c['\Backup\Commands\CPanelBackup'] = function (Container $c) {
-            return (new CPanelBackupCommand($c['cpanel_config'],
-                $c['http_client']));
+            return (new CPanelBackupCommand($c['config.cpanel'],
+                $c['http.client']));
         };
 
         $c['\Backup\Commands\FtpPush'] = function (Container $c) {
-            return new FtpPushCommand($c['ftp_target_config'],
-                $c['ftp_client']);
+            return new FtpPushCommand($c['config.ftp_target'],
+                $c['ftp.client']);
         };
     }
 }

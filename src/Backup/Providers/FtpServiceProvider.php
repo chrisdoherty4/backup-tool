@@ -31,7 +31,7 @@ class FtpServiceProvider implements ServiceProviderInterface
 {
     public function register(Container $c) 
     {        
-        $c['ftp_client'] = $c->factory(function (Container $c) {
+        $c['ftp.client'] = $c->factory(function (Container $c) {
             return new FtpClient();
         });
     }

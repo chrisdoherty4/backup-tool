@@ -31,9 +31,9 @@ class HttpServiceProvider implements ServiceProviderInterface
 {
     public function register(Container $c) 
     {        
-        $c['http_client'] = function (Container $c) {
+        $c['http.client'] = function (Container $c) {
             return new HttpClient([
-                'base_uri' => $c['cpanel_config']->get('uri'),
+                'base_uri' => $c['config.cpanel']->get('uri'),
                 'cookies' => true,
                 'allow_redirects' => false
             ]);
