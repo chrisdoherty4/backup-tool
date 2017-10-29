@@ -36,5 +36,5 @@ return [
     /**
      * Should we output HTTP debug?
      */
-    'debug' => env('CPANEL_DEBUG')
+    'debug' => false
 ];

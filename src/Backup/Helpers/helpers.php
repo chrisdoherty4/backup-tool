@@ -63,14 +63,14 @@ if (!function_exists('base_path')) {
      * @throws \RuntimeException Thrown if the path is invalid.
      */
     function base_path($path = "") 
-    {   
-        $path = realpath(__DIR__ . '/../../..' . rtrim($path, '/'));
-        
-        if ($path === false) {
-            throw new \RuntimeException("Path does not exist.");
+    {
+        static $base = null;
+
+        if (!$base) {
+            $base = realpath(__DIR__ . '/../../..');
         }
         
-        return $path;
+        return sprintf("%s%s", $base, rtrim($path, '/'));
     }
 }
 

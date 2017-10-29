@@ -17,22 +17,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Backup\Providers;
+return [    
+    'ftp' => [
+        /**
+         * The host of the FTP server to push to. This can be a domain name or
+         * URI.
+         */
+        'host' => env('RELOCATE_FTP_HOST'),
 
-use \Pimple\ServiceProviderInterface;
-use \Pimple\Container;
-use \FtpClient\FtpClient;
+        /**
+         * The username to log in with.
+         */
+        'username' => env('RELOCATE_FTP_USER'),
 
-/**
- * @class FtpServiceProvider
- * @author Chris Doherty <chris.doherty4@gmail.com>
- */
-class FtpServiceProvider implements ServiceProviderInterface
-{
-    public function register(Container $c) 
-    {        
-        $c['ftp.client'] = $c->factory(function (Container $c) {
-            return new FtpClient();
-        });
-    }
-}
+        /**
+         * The password for the username.
+         */
+        'password' => env('RELOCATE_FTP_PASS'),
+
+        /**
+         * The port of the FTP server.
+         */
+        'port' => env('RELOCATE_FTP_PORT'),
+
+        /**
+         * Set passive transfer mode on or off.
+         */
+        'passive' => true
+    ]
+];

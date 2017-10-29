@@ -22,6 +22,7 @@ namespace Backup\Providers;
 use \Pimple\ServiceProviderInterface;
 use \Pimple\Container;
 use \Backup\Commands\CPanelBackup as CPanelBackupCommand;
+use \Backup\Commands\Relocate as RelocateCommand;
 use \Backup\Commands\FtpPush as FtpPushCommand;
 
 /**
@@ -33,13 +34,18 @@ class CommandsServiceProvider implements ServiceProviderInterface
     public function register(Container $c) 
     {
         $c['\Backup\Commands\CPanelBackup'] = function (Container $c) {
-            return (new CPanelBackupCommand($c['config.cpanel'],
-                $c['http.client']));
+            return new CPanelBackupCommand($c['config.cpanel'],
+                $c['http.client']);
         };
 
-        $c['\Backup\Commands\FtpPush'] = function (Container $c) {
-            return new FtpPushCommand($c['config.ftp_target'],
-                $c['ftp.client']);
+        $c['\Backup\Commands\Relocate'] = function (Container $c) {
+            return new RelocateCommand($c['filesystem.mount_manager'],
+                $c['config.relocate']['ftp']);
         };
+
+//        $c['\Backup\Commands\FtpPush'] = function (Container $c) {
+//            return new FtpPushCommand($c['config.relocate']['ftp'],
+//                $c['ftp.client']);
+//        };
     }
 }

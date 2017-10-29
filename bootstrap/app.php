@@ -74,7 +74,8 @@ $app->boot();
  * Lets register the commands we expet for the application.
  */
 $app->command($app['\Backup\Commands\CPanelBackup']);
-$app->command($app['\Backup\Commands\FtpPush']);
+$app->command($app['\Backup\Commands\Relocate']);
+//$app->command($app['\Backup\Commands\FtpPush']);
 
 
 return $app;

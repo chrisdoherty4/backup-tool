@@ -80,7 +80,7 @@ class CPanelBackup extends AbstractCommand
      */
     public function configure()
     {
-        $this->setName('cpanel')
+        $this->setName('backup:cpanel')
             ->setTitle('CPanel Backup Command')
             ->setDescription('A complete backup via cPanel that stashes the'
                 . ' backup in the home directory.');
