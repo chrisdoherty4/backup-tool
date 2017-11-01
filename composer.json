@@ -35,5 +35,8 @@
         "psr-4": {
             "Backup\\": "src/Backup"
         }
+    },
+    "autoload-dev": {
+        "Backup\\Test\\": "tests/src/"
     }
 }
