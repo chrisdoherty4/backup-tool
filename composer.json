@@ -38,5 +38,10 @@
     },
     "autoload-dev": {
         "Backup\\Test\\": "tests/src/"
+    },
+    "scripts": {
+        "test": [
+            "phpunit"
+        ]
     }
 }
