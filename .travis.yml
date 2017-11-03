@@ -7,4 +7,4 @@ before_script:
     - composer install --prefer-source --no-interaction 
 
 script:
-    - phpunit test/Backup/Test/SimpleTest.php
+    - phpunit tests/Backup/Test/SimpleTest.php
