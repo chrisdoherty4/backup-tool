@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/chrisdoherty4/backup-tool.svg?branch=master)](https://travis-ci.org/chrisdoherty4/backup-tool)
+
 # Backup Tool
 
 A simple backup tool used to create and store backups on different platforms. The program is used on a command line and typically invoked via a crontab. 
