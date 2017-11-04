@@ -75,7 +75,6 @@ $app->boot();
  */
 $app->command($app['\Backup\Commands\CPanelBackup']);
 $app->command($app['\Backup\Commands\Relocate']);
-//$app->command($app['\Backup\Commands\FtpPush']);
 
 
 return $app;
