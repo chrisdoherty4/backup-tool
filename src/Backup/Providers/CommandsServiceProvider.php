@@ -23,7 +23,6 @@ use \Pimple\ServiceProviderInterface;
 use \Pimple\Container;
 use \Backup\Commands\CPanelBackup as CPanelBackupCommand;
 use \Backup\Commands\Relocate as RelocateCommand;
-use \Backup\Commands\FtpPush as FtpPushCommand;
 
 /**
  * @class CommandsServiceProvider
@@ -46,10 +45,5 @@ class CommandsServiceProvider implements ServiceProviderInterface
                 $c['config.relocate']['ftp']
             );
         };
-
-        //        $c['\Backup\Commands\FtpPush'] = function (Container $c) {
-        //            return new FtpPushCommand($c['config.relocate']['ftp'],
-        //                $c['ftp.client']);
-        //        };
     }
 }
