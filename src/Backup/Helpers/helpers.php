@@ -20,14 +20,14 @@
 if (!function_exists('env')) {
     
     /**
-     * Retrieves an environment variable with an optional default should the 
-     * variable not exist. 
-     * 
+     * Retrieves an environment variable with an optional default should the
+     * variable not exist.
+     *
      * @param  string $key     The key of the environment variable.
      * @param  mixed  $default The default value (null if not set).
      * @return mixed
      */
-    function env($key, $default = null) 
+    function env($key, $default = null)
     {
         $value = getenv($key);
         
@@ -36,15 +36,15 @@ if (!function_exists('env')) {
         }
         
         switch (strtolower($value)) {
-        case "true":
-            $value = true;
-            break;
-        case "false":
-            $value = false;
-            break;
-        case "null": 
-            $value = null;
-            break;
+            case "true":
+                $value = true;
+                break;
+            case "false":
+                $value = false;
+                break;
+            case "null":
+                $value = null;
+                break;
         }
         
         return $value;
@@ -56,13 +56,13 @@ if (!function_exists('base_path')) {
     
     /**
      * Creates an absolute path to the root application directory.
-     * 
-     * @param  string $path An optional extension to the base path. 
+     *
+     * @param  string $path An optional extension to the base path.
      * @return string The path.
-     * 
+     *
      * @throws \RuntimeException Thrown if the path is invalid.
      */
-    function base_path($path = "") 
+    function base_path($path = "")
     {
         static $base = null;
 
@@ -78,14 +78,14 @@ if (!function_exists('config_path')) {
     
     /**
      * Creates a path to the config directory with an optional extension.
-     * 
+     *
      * @param  string $path
      * @return string The path.
-     * 
+     *
      * @throws \RunetimeException Thrown if the path is invalid.
      */
-    function config_path($path = "") 
-    {        
+    function config_path($path = "")
+    {
         return base_path("/config" . $path);
     }
 }

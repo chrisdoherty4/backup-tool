@@ -29,8 +29,8 @@ use \GuzzleHttp\Client as HttpClient;
  */
 class HttpServiceProvider implements ServiceProviderInterface
 {
-    public function register(Container $c) 
-    {        
+    public function register(Container $c)
+    {
         $c['http.client'] = function (Container $c) {
             return new HttpClient(
                 [

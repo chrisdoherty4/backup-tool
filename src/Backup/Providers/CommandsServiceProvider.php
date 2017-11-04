@@ -31,7 +31,7 @@ use \Backup\Commands\FtpPush as FtpPushCommand;
  */
 class CommandsServiceProvider implements ServiceProviderInterface
 {
-    public function register(Container $c) 
+    public function register(Container $c)
     {
         $c['\Backup\Commands\CPanelBackup'] = function (Container $c) {
             return new CPanelBackupCommand(

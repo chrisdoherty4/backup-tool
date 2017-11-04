@@ -27,11 +27,11 @@ use \PHLAK\Config\Config;
 
 /**
  * @class CPanelBackup
- * Backs up a website via the CPanel full website backup feature. All CPanel 
+ * Backs up a website via the CPanel full website backup feature. All CPanel
  * configuration is achieved through the Dotenv file located at a user defined
  * location.
- * 
- * The command expects a single argument, the Dotenv directory path. 
+ *
+ * The command expects a single argument, the Dotenv directory path.
  *
  * @author Chris Doherty <chris.doherty4@gmail.com>
  */
@@ -40,7 +40,7 @@ class CPanelBackup extends AbstractCommand
     
     /**
      * The guzzle client used to log in to the CPanel interface.
-     * 
+     *
      * @var \GuzzlHttp\Client
      */
     private $httpClient;
@@ -54,7 +54,7 @@ class CPanelBackup extends AbstractCommand
     /**
      * The path of the website we're interfacing with. This is gathered from
      * the response of our login request.
-     * 
+     *
      * @var string
      */
     private $path;
@@ -75,7 +75,7 @@ class CPanelBackup extends AbstractCommand
     
     /**
      * Configures the command object.
-     * 
+     *
      * @return void
      */
     public function configure()
@@ -90,7 +90,7 @@ class CPanelBackup extends AbstractCommand
     
     /**
      * Logs in to cPanel and requests a backup be created to the home directory.
-     * 
+     *
      * @param  InputInterface  $input  Console input interface.
      * @param  OutputInterface $output Console output interface.
      * @return void
@@ -131,15 +131,17 @@ class CPanelBackup extends AbstractCommand
     }
     
     /**
-     * Logs in to the CPanel interface using the http client and defined 
+     * Logs in to the CPanel interface using the http client and defined
      * environment variables.
-     * 
+     *
      * @return \GuzzleHttp\Response
      */
     private function login()
     {
         return $this->httpClient->request(
-            'POST', '/login', [
+            'POST',
+            '/login',
+            [
             'form_params' => [
                 'user' => $this->cpanelConfig->get('username'),
                 'pass' => $this->cpanelConfig->get('password'),
@@ -153,13 +155,13 @@ class CPanelBackup extends AbstractCommand
     /**
      * Submits the CPanel backup request and asks CPanel to push the backup
      * to an FTP server.
-     * 
+     *
      * @return \GuzzleHttp\Response
      */
     private function createBackup()
     {
         return $this->httpClient->request(
-            'POST', 
+            'POST',
             $this->createPath('backup/wizard-dofullbackup.html'),
             [
                 'form_params' => [
@@ -174,7 +176,7 @@ class CPanelBackup extends AbstractCommand
     /**
      * Retrieves a full path including the extension retrieved from the initial
      * response when we logged into CPanel.
-     * 
+     *
      * @param  string $extension
      * @return string
      */
@@ -184,16 +186,16 @@ class CPanelBackup extends AbstractCommand
     }
     
     /**
-     * This function expects the initial response from a CPanel login as the 
+     * This function expects the initial response from a CPanel login as the
      * redirect or location will merely be to the index.php page. This function
      * extracts the path excluding the index.php segment so we can use it when
-     * submitting a request for backup. 
-     * 
-     * @param  HttpResponse $response The http response received from a CPanel 
+     * submitting a request for backup.
+     *
+     * @param  HttpResponse $response The http response received from a CPanel
      *                                login.
      * @return string
      */
-    private function extractLoginResponsePath(HttpResponse $response) 
+    private function extractLoginResponsePath(HttpResponse $response)
     {
         $path = (new \Purl\Url($response->getHeader('Location')[0]))->path;
         return substr($path, 0, strrpos($path, "/"));

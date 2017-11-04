@@ -37,7 +37,7 @@ abstract class AbstractCommand extends Command
 
     /**
      * Sets the command title.
-     * 
+     *
      * @param  strnig $title
      * @return $this
      */
@@ -50,7 +50,7 @@ abstract class AbstractCommand extends Command
 
     /**
      * Retrieves the command title.
-     * 
+     *
      * @return string
      */
     public function getTitle()
@@ -60,7 +60,7 @@ abstract class AbstractCommand extends Command
 
     /**
      * Retrieves a formatted command header.
-     * 
+     *
      * @return string
      */
     public function getHeader()
@@ -78,7 +78,7 @@ abstract class AbstractCommand extends Command
 
     /**
      * Writes the command header to the console.
-     * 
+     *
      * @param OutputInterface $output
      */
     public function writeHeader(OutputInterface $output)
@@ -86,4 +86,3 @@ abstract class AbstractCommand extends Command
         $output->writeln($this->getCommandHeader());
     }
 }
-

@@ -29,9 +29,9 @@ use \PHLAK\Config\Config;
  */
 class ConfigServiceProvider implements ServiceProviderInterface
 {
-    public function register(Container $c) 
+    public function register(Container $c)
     {
-        // Read all configuration files. 
+        // Read all configuration files.
         $configPath = config_path();
         $files = array_diff(scandir($configPath), ['.', '..']);
         
@@ -39,7 +39,7 @@ class ConfigServiceProvider implements ServiceProviderInterface
             $fileName = substr($file, 0, strrpos($file, '.'));
             
             $c['config.'.$fileName] = function (Container $c) use (
-                $file, 
+                $file,
                 $configPath
             ) {
                 return new Config($configPath."/".$file);

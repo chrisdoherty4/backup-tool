@@ -33,14 +33,14 @@ class Relocate extends AbstractCommand
 {
     /**
      * The file system containing the file to be moved.
-     * 
+     *
      * @var \League\Filesystem\Filesystem
      */
     private $mountManager = null;
 
     /**
      * Initialises command with appropriate dependencies.
-     * 
+     *
      * @param \Backup\Providers\FileSystem\MountManager $mountManager
      * @param array                                     $ftpConfig
      */
@@ -67,7 +67,9 @@ class Relocate extends AbstractCommand
             ->setTitle('Relocate - FTP')
             ->setDescription("Relocate a backup to an FTP server.")
             ->addArgument(
-                'backup_path', InputArgument::REQUIRED, 'The fully '
+                'backup_path',
+                InputArgument::REQUIRED,
+                'The fully '
                 . 'qualified backup path. The filename portion of the path can '
                 . 'include a wildcard (*) to match multiple backup files.'
             );
@@ -76,7 +78,7 @@ class Relocate extends AbstractCommand
     /**
      * Using a provided path to the backup file, takes the backup file and
      * pushes to an FTP server.
-     * 
+     *
      * @param InputInterface  $input
      * @param OutputInterface $output
      */
@@ -145,7 +147,8 @@ class Relocate extends AbstractCommand
         $backups = array_values(glob($backupPath));
 
         array_walk(
-            $backups, function (&$path, $key) {
+            $backups,
+            function (&$path, $key) {
                 $path = substr($path, strrpos($path, '/')+1, strlen($path));
             }
         );
@@ -155,7 +158,7 @@ class Relocate extends AbstractCommand
 
     /**
      * Extracts the parent path from a path to a file.
-     * 
+     *
      * @param  strnig $path
      * @return string
      */
@@ -167,7 +170,7 @@ class Relocate extends AbstractCommand
     /**
      * Moves backups from source to destination as specified in the mount
      * manager.
-     * 
+     *
      * @param  array $backups An array of backup files.
      * @return int The number of successful transfers.
      */
@@ -178,15 +181,14 @@ class Relocate extends AbstractCommand
         foreach ($backups as $file) {
             try {
                 $this->mountManager->write(
-                    'destination://'.$file, 
+                    'destination://'.$file,
                     $this->mountManager->read('source://'.$file)
                 );
 
                 $this->mountManager->delete('source://'.$file);
 
                 $successful+= 1;
-            }
-            catch (\RuntimeException $e) {
+            } catch (\RuntimeException $e) {
                 // Do nothing, we don't really care much.
             }
         }

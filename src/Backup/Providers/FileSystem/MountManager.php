@@ -32,7 +32,7 @@ class MountManager extends LeagueMountManager
 {
     /**
      * A reference to the pimpl container.
-     * 
+     *
      * @var \Pimple\Container
      */
     private $container = null;
@@ -52,7 +52,7 @@ class MountManager extends LeagueMountManager
 
     /**
      * Constructor.
-     * 
+     *
      * @param Container $container
      */
     public function __construct(Container $container)
@@ -95,8 +95,8 @@ class MountManager extends LeagueMountManager
 
     /**
      * Retrieves a file system for the local system.
-     * 
-     * @param  string $path The root path. 
+     *
+     * @param  string $path The root path.
      * @return Filesystem
      */
     public function getLocalInstance($path)
@@ -106,7 +106,7 @@ class MountManager extends LeagueMountManager
 
     /**
      * Validates the supplied configuration against the required fields.
-     * 
+     *
      * @param  array $config The config to validate.
      * @return bool|array True if valid, else an array of missing fields.
      */
