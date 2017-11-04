@@ -5,8 +5,7 @@ php:
 
 before_script:
     - composer install --prefer-source --no-interaction --no-suggest
-    - composer global require squizlabds/php_codesniffer
 
 script:
     - phpunit tests/Backup/Test/SimpleTest.php
-    - phpcs ./src ./test
+    - ./vendor/squizlabs/php_codesniffer/bin/phpcs --standard=PSR2 ./src ./tests
