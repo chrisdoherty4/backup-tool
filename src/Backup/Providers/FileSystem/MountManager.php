@@ -39,6 +39,7 @@ class MountManager extends LeagueMountManager
 
     /**
      * The required fields for an FTP adapter configuration.
+     *
      * @var array
      */
     private $ftpConfigFields = [
@@ -74,24 +75,28 @@ class MountManager extends LeagueMountManager
     /**
      * Retrieves an instance of an FTP Filsystem.
      *
-     * @param array $config The FTP configuration.
+     * @param  array $config The FTP configuration.
      * @return Filesystem
      */
     public function getFtpInstance($config)
     {
-        return new Filesystem(new FtpAdapter([
-            'host' => $config['host'],
-            'username' => $config['username'],
-            'password' => $config['password'],
-            'port' => $config['port'],
-            'passive' => $config['passive']
-        ]));
+        return new Filesystem(
+            new FtpAdapter(
+                [
+                'host' => $config['host'],
+                'username' => $config['username'],
+                'password' => $config['password'],
+                'port' => $config['port'],
+                'passive' => $config['passive']
+                ]
+            )
+        );
     }
 
     /**
      * Retrieves a file system for the local system.
      * 
-     * @param string $path The root path. 
+     * @param  string $path The root path. 
      * @return Filesystem
      */
     public function getLocalInstance($path)
@@ -102,7 +107,7 @@ class MountManager extends LeagueMountManager
     /**
      * Validates the supplied configuration against the required fields.
      * 
-     * @param array $config The config to validate.
+     * @param  array $config The config to validate.
      * @return bool|array True if valid, else an array of missing fields.
      */
     public function isValidFtpConfig($config)

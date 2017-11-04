@@ -36,7 +36,8 @@ use \PHLAK\Config\Config;
  * @author Chris Doherty <chris.doherty4@gmail.com>
  */
 class CPanelBackup extends AbstractCommand
-{    
+{
+    
     /**
      * The guzzle client used to log in to the CPanel interface.
      * 
@@ -59,14 +60,13 @@ class CPanelBackup extends AbstractCommand
     private $path;
 
     /**
-     * @param Config $config
+     * @param Config     $config
      * @param HttpClient $client
      */
     public function __construct(
         Config $config,
         HttpClient $client
-    )
-    {
+    ) {
         parent::__construct();
         
         $this->cpanelConfig = $config;
@@ -82,15 +82,17 @@ class CPanelBackup extends AbstractCommand
     {
         $this->setName('backup:cpanel')
             ->setTitle('CPanel Backup Command')
-            ->setDescription('A complete backup via cPanel that stashes the'
-                . ' backup in the home directory.');
+            ->setDescription(
+                'A complete backup via cPanel that stashes the'
+                . ' backup in the home directory.'
+            );
     }
     
     /**
      * Logs in to cPanel and requests a backup be created to the home directory.
      * 
-     * @param InputInterface $input Console input interface.
-     * @param OutputInterface $output Console output interface.
+     * @param  InputInterface  $input  Console input interface.
+     * @param  OutputInterface $output Console output interface.
      * @return void
      */
     public function execute(InputInterface $input, OutputInterface $output)
@@ -110,15 +112,21 @@ class CPanelBackup extends AbstractCommand
             $output->writeln("<info>Requesting backup to home directory.</>");
             
             if ($this->createBackup()->getStatusCode() == 200) {
-                $output->writeln("<info>Successfully requested backup. Backups"
-                    . " take time to complete so may not appear instantly.</>");
+                $output->writeln(
+                    "<info>Successfully requested backup. Backups"
+                    . " take time to complete so may not appear instantly.</>"
+                );
             } else {
-                $output->writeln("<error>There was an error requesting a "
-                        . "backup.</>");
+                $output->writeln(
+                    "<error>There was an error requesting a "
+                    . "backup.</>"
+                );
             }
         } else {
-            $output->writeln("<error>Failed to log in to CPanel. Check the "
-                    . "supplied credentials in the .env.cpanelbackup file.</>");
+            $output->writeln(
+                "<error>Failed to log in to CPanel. Check the "
+                . "supplied credentials in the .env.cpanelbackup file.</>"
+            );
         }
     }
     
@@ -130,14 +138,16 @@ class CPanelBackup extends AbstractCommand
      */
     private function login()
     {
-        return $this->httpClient->request('POST', '/login', [
+        return $this->httpClient->request(
+            'POST', '/login', [
             'form_params' => [
                 'user' => $this->cpanelConfig->get('username'),
                 'pass' => $this->cpanelConfig->get('password'),
                 'goto_uri' => '/'
             ],
             'debug' => $this->cpanelConfig->get('debug')
-        ]);
+            ]
+        );
     }
     
     /**
@@ -157,14 +167,15 @@ class CPanelBackup extends AbstractCommand
                     'email_radio' => 0
                 ],
                 'debug' => $this->cpanelConfig->get('debug')
-            ]);
+            ]
+        );
     }
     
     /**
      * Retrieves a full path including the extension retrieved from the initial
      * response when we logged into CPanel.
      * 
-     * @param string $extension
+     * @param  string $extension
      * @return string
      */
     private function createPath($extension)
@@ -178,8 +189,8 @@ class CPanelBackup extends AbstractCommand
      * extracts the path excluding the index.php segment so we can use it when
      * submitting a request for backup. 
      * 
-     * @param HttpResponse $response The http response received from a CPanel 
-     *  login.
+     * @param  HttpResponse $response The http response received from a CPanel 
+     *                                login.
      * @return string
      */
     private function extractLoginResponsePath(HttpResponse $response) 

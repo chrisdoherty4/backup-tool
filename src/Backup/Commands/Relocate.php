@@ -42,18 +42,20 @@ class Relocate extends AbstractCommand
      * Initialises command with appropriate dependencies.
      * 
      * @param \Backup\Providers\FileSystem\MountManager $mountManager
-     * @param array $ftpConfig
+     * @param array                                     $ftpConfig
      */
     public function __construct(
         MountManager $mountManager,
-        array $ftpConfig)
-    {
+        array $ftpConfig
+    ) {
         parent::__construct();
         
         $this->mountManager = $mountManager;
 
-        $this->mountManager->mountFilesystem('destination',
-            $this->mountManager->getFtpInstance($ftpConfig));
+        $this->mountManager->mountFilesystem(
+            'destination',
+            $this->mountManager->getFtpInstance($ftpConfig)
+        );
     }
 
     /**
@@ -64,16 +66,18 @@ class Relocate extends AbstractCommand
         $this->setName("relocate:ftp")
             ->setTitle('Relocate - FTP')
             ->setDescription("Relocate a backup to an FTP server.")
-            ->addArgument('backup_path', InputArgument::REQUIRED, 'The fully '
+            ->addArgument(
+                'backup_path', InputArgument::REQUIRED, 'The fully '
                 . 'qualified backup path. The filename portion of the path can '
-                . 'include a wildcard (*) to match multiple backup files.');
+                . 'include a wildcard (*) to match multiple backup files.'
+            );
     }
 
     /**
      * Using a provided path to the backup file, takes the backup file and
      * pushes to an FTP server.
      * 
-     * @param InputInterface $input
+     * @param InputInterface  $input
      * @param OutputInterface $output
      */
     public function execute(InputInterface $input, OutputInterface $output)
@@ -85,8 +89,10 @@ class Relocate extends AbstractCommand
         $base = $this->extractParentPath($path);
 
         if ($base) {
-            $this->mountManager->mountFilesystem('source',
-                $this->mountManager->getLocalInstance($base));
+            $this->mountManager->mountFilesystem(
+                'source',
+                $this->mountManager->getLocalInstance($base)
+            );
         } else {
             $output->writeln("<error>The path provided is invalid</>");
             return;
@@ -97,11 +103,14 @@ class Relocate extends AbstractCommand
         $total = count($backups);
 
         $output->writeln(
-            "<info>Found ".count($backups)." backup(s)</>");
+            "<info>Found ".count($backups)." backup(s)</>"
+        );
 
         if (!$total) {
-            $output->writeln("<comment>If you're expecting backups to be "
-                . "present, check the path (".$path.")</>");
+            $output->writeln(
+                "<comment>If you're expecting backups to be "
+                . "present, check the path (".$path.")</>"
+            );
         }
 
         if ($total) {
@@ -110,11 +119,15 @@ class Relocate extends AbstractCommand
             $complete = $this->relocateBackups($backups);
 
             if ($complete == $total) {
-                $output->writeln("<info>Successfully transfered all "
-                    . "backups</>");
+                $output->writeln(
+                    "<info>Successfully transfered all "
+                    . "backups</>"
+                );
             } else {
-                $output->writeln("<error>Failed to transfer " .
-                    ($total - $complete) . " backup(s)</>");
+                $output->writeln(
+                    "<error>Failed to transfer " .
+                    ($total - $complete) . " backup(s)</>"
+                );
             }
         }
     }
@@ -123,17 +136,19 @@ class Relocate extends AbstractCommand
      * Retrieves all the files for transfer based on the backup path defined
      * in the environment file.
      *
-     * @param string $backupPath A string that references a directory with
-     *  backups. This can have a * wildcard representing any character.
+     * @param  string $backupPath A string that references a directory with
+     *                            backups. This can have a * wildcard representing any character.
      * @return array An array of files that match the backup path string.
      */
     private function getBackups($backupPath)
     {
         $backups = array_values(glob($backupPath));
 
-        array_walk($backups, function (&$path, $key) {
-            $path = substr($path, strrpos($path, '/')+1, strlen($path));
-        });
+        array_walk(
+            $backups, function (&$path, $key) {
+                $path = substr($path, strrpos($path, '/')+1, strlen($path));
+            }
+        );
         
         return $backups;
     }
@@ -141,7 +156,7 @@ class Relocate extends AbstractCommand
     /**
      * Extracts the parent path from a path to a file.
      * 
-     * @param strnig $path
+     * @param  strnig $path
      * @return string
      */
     private function extractParentPath($path)
@@ -153,7 +168,7 @@ class Relocate extends AbstractCommand
      * Moves backups from source to destination as specified in the mount
      * manager.
      * 
-     * @param array $backups An array of backup files.
+     * @param  array $backups An array of backup files.
      * @return int The number of successful transfers.
      */
     private function relocateBackups($backups)
@@ -162,8 +177,10 @@ class Relocate extends AbstractCommand
 
         foreach ($backups as $file) {
             try {
-                $this->mountManager->write('destination://'.$file, 
-                    $this->mountManager->read('source://'.$file));
+                $this->mountManager->write(
+                    'destination://'.$file, 
+                    $this->mountManager->read('source://'.$file)
+                );
 
                 $this->mountManager->delete('source://'.$file);
 

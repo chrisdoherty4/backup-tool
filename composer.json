@@ -43,6 +43,9 @@
     "scripts": {
         "test": [
             "phpunit"
+        ],
+        "analyse": [
+            "./vendor/squizlabs/php_codesniffer/bin/phpcs --standard=PSR2 ./src ./tests"
         ]
     }
 }

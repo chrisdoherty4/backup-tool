@@ -2,6 +2,6 @@
 
 // Boostrap the application. 
 
-$app = require '../../../../bootstrap/app.php';
+$app = include '../../../../bootstrap/app.php';
 
 

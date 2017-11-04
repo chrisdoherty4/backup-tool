@@ -39,9 +39,9 @@ class ConfigServiceProvider implements ServiceProviderInterface
             $fileName = substr($file, 0, strrpos($file, '.'));
             
             $c['config.'.$fileName] = function (Container $c) use (
-                    $file, 
-                    $configPath
-                ) {
+                $file, 
+                $configPath
+            ) {
                 return new Config($configPath."/".$file);
             };
         }

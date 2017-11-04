@@ -38,7 +38,7 @@ abstract class AbstractCommand extends Command
     /**
      * Sets the command title.
      * 
-     * @param strnig $title
+     * @param  strnig $title
      * @return $this
      */
     public function setTitle($title)
@@ -65,11 +65,13 @@ abstract class AbstractCommand extends Command
      */
     public function getHeader()
     {
-        $header = sprintf("%s\n%s\n%s\n%s\n",
+        $header = sprintf(
+            "%s\n%s\n%s\n%s\n",
             "==================================================",
             $this->getTitle(),
             (new \DateTime())->format('Y-m-d T H:i:sP'),
-            "==================================================");
+            "=================================================="
+        );
 
         return $header;
     }

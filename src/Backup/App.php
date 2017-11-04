@@ -33,7 +33,7 @@ class App extends CommandConsole
     /**
      * Registers an array of service providers.
      * 
-     * @param array $providers
+     * @param  array $providers
      * @return $this
      */
     public function registerMultiple(array $providers) 

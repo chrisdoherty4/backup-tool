@@ -32,11 +32,13 @@ class HttpServiceProvider implements ServiceProviderInterface
     public function register(Container $c) 
     {        
         $c['http.client'] = function (Container $c) {
-            return new HttpClient([
+            return new HttpClient(
+                [
                 'base_uri' => $c['config.cpanel']->get('uri'),
                 'cookies' => true,
                 'allow_redirects' => false
-            ]);
+                ]
+            );
         };
     }
 }
