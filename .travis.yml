@@ -7,5 +7,5 @@ before_script:
     - composer install --prefer-source --no-interaction --no-suggest
 
 script:
-    - phpunit tests/Backup/Test/SimpleTest.php
-    - ./vendor/squizlabs/php_codesniffer/bin/phpcs --standard=PSR2 ./src ./tests
+    - ./vendor/bin/phpunit 
+    - ./vendor/bin/phpcs --standard=PSR2 ./src ./tests
