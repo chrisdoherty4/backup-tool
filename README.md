@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/chrisdoherty4/backup-tool.svg?branch=master)](https://travis-ci.org/chrisdoherty4/backup-tool)
+[![Build Status](https://travis-ci.org/chrisdoherty4/backup-tool.svg?branch=master)](https://travis-ci.org/chrisdoherty4/backup-tool) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/chrisdoherty4/backup-tool/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/chrisdoherty4/backup-tool/?branch=master)
 
 # Backup Tool
 
