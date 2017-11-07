@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Backup\Providers\FileSystem;
+namespace Backup\FileSystem;
 
 use \Pimple\Container;
 use \League\Flysystem\MountManager as LeagueMountManager;

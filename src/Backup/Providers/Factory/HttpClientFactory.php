@@ -1,6 +1,6 @@
 <?php
 
-/* 
+/*
  * Copyright (C) 2017 Chris Doherty
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,27 +17,44 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Backup\Providers;
+namespace Backup\Providers\Factory;
 
-use \Pimple\ServiceProviderInterface;
-use \Pimple\Container;
-use \Backup\FileSystem\MountManager;
+use Pimple\Pimple;
+use GuzzleHttp\Client;
 
 /**
- * @class FileSystemServiceProvider
+ * @class HttpClientFactory
+ * Factories HTTP client objects. 
+ *
  * @author Chris Doherty <chris.doherty4@gmail.com>
  */
-class FileSystemServiceProvider implements ServiceProviderInterface
+class HttpClientFactory
 {
-    public function register(Container $c)
+    /**
+     * The dependency container.
+     * 
+     * @var Pimple\Pimple
+     */
+    private $container = null;
+
+    /**
+     * Constructor.
+     * 
+     * @param Pimple $container
+     */
+    public function __construct(Pimple $container)
     {
-        $c['filesystem.mount_manager'] = function (Container $c) {
-            return new MountManager($c);
-        };
-        
-        $c['filesystem.ftp'] = function (Container $c) {
-            return $c['filesystem.mount_manager']
-                ->getFtpInstance($c['config.relocate']['ftp']);
-        };
+        $this->container = $container;
+    }
+    
+    /**
+     * Retrieves an instance of the HttpFactory.
+     *
+     * @param array $args Constructor arguments for the http client.
+     * @return HttpClien
+     */
+    public function instance(array $args)
+    {        
+        return new HttpClient($args);
     }
 }

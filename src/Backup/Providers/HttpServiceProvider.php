@@ -19,9 +19,9 @@
 
 namespace Backup\Providers;
 
-use \Pimple\Container;
-use \Pimple\ServiceProviderInterface;
-use \GuzzleHttp\Client as HttpClient;
+use Pimple\Container;
+use Pimple\ServiceProviderInterface;
+use Backup\Providers\Factory\HttpClientFactory;
 
 /**
  * @class HttpServiceProvider
@@ -30,15 +30,9 @@ use \GuzzleHttp\Client as HttpClient;
 class HttpServiceProvider implements ServiceProviderInterface
 {
     public function register(Container $c)
-    {
-        $c['http.client'] = function (Container $c) {
-            return new HttpClient(
-                [
-                'base_uri' => $c['config.cpanel']->get('uri'),
-                'cookies' => true,
-                'allow_redirects' => false
-                ]
-            );
+    {        
+        $c['http.client.factory'] = function (Container $c) {
+            return new HttpClientFactory($c);
         };
     }
 }
