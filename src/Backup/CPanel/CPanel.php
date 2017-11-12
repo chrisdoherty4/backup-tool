@@ -1,19 +1,34 @@
 <?php
+
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (C) 2017 Chris Doherty
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 namespace Backup\CPanel;
 
 use Backup\Providers\Factory\HttpClientFactory;
-use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\Psr7\ResponseInterface;
+use GuzzleHttp\Psr7\Uri;
 use PHLAK\Config\Config;
 
 /**
  * @class CPanel
- * 
+ * Interfaces CPanel commands with the application. Provides methods for
+ * logging in to and submitting backup requests.
+ *
  * @author Chris Doherty <chris.doherty4@gmail.com>
  */
 class CPanel
@@ -24,7 +39,7 @@ class CPanel
     private $client = null;
 
     /**
-     * @var GuzzleHttp\Response
+     * @var GuzzleHttp\Psr7\ResponseInterface
      */
     private $lastResponse = null;
 
@@ -37,7 +52,18 @@ class CPanel
      * @var PHLAK\Config\Config
      */
     private $config = null;
-    
+
+    /**
+     * @var string
+     */
+    private $pathPrefix = '';
+
+    /**
+     * Constructor
+     *
+     * @param HttpClientFactory $factory
+     * @param Config $config
+     */
     public function __construct(HttpClientFactory $factory, Config $config)
     {
         $this->client = $factory->instance($config);
@@ -45,88 +71,125 @@ class CPanel
         $this->setConfig($config);
     }
 
+    /**
+     * Request pass through to allow $this->post(), $this->get() type calls
+     * for making http requests.
+     *
+     * @param string $name The method being called.
+     * @param array $args The arguments supplied.
+     * @return mixed The return of the called function.
+     */
+    public function __call($name, $args)
+    {
+        static $allowed = ['get', 'post', 'delete', 'put'];
+
+        if (!in_array($name, $allowed)) {
+            trigger_error(
+                'Call to undefined method '.__CLASS__.'::'.$name.'()',
+                E_USER_ERROR
+            );
+        }
+
+        array_unshift($args, strtoupper($name));
+
+        return call_user_func([$this, $name], $args);
+    }
+
+    /**
+     * Retrieves the Http Client used to communicate with cPanel.
+     *
+     * @return GuzzleHttp\Client
+     */
     public function getHttpClient()
     {
         return $this->client;
     }
 
+    /**
+     * Retrieves the last response.
+     *
+     * @return GuzzleHttp\Psr7\ResponseInterface
+     */
     public function getLastResponse()
     {
         return $this->lastResponse;
     }
 
+    /**
+     * Retrieves the configuration object.
+     *
+     * @return PHLAK\Config\Config
+     */
     public function getConfig()
     {
         return $this->config;
     }
 
-    public function login()
+    /**
+     * Determines if a successful login has been performed.
+     *
+     * @return bool
+     */
+    public function isLoggedIn()
     {
-        $this->lastResponse = $this->client->request(
-            'POST',
-            '/login',
-            [
-            'form_params' => [
-                'user' => $this->config->get('username'),
-                'pass' => $this->config->get('password'),
-                'goto_uri' => '/'
-            ],
-            'debug' => $this->config->get('debug')
-            ]
-        );
-
-        $result = $this->isResponseOk($this->lastResponse);
-
-        if ($result) {
-            $path = (new \Purl\Url(
-                $this->lastResponse->getHeader('Location')[0]
-            ))->path;
-
-            $this->path = substr($path, 0, strrpos($path, "/"));
-        }
-
-        return $result;
+        return $this->loggedIn;
     }
 
+    /**
+     * Logs in to cPanel.
+     *
+     * @return $this
+     */
+    public function login()
+    {
+        return $this->post(
+            '/login',
+            [
+                'form_params' => [
+                    'user' => $this->config->get('username'),
+                    'pass' => $this->config->get('password'),
+                    'goto_uri' => '/'
+                ]
+            ],
+            function (Response $response) use ($this) {
+                $this->path = $this->extractLoginResponsePath($response);
+                $this->setLoggedIn();
+            }
+        );
+    }
+
+    /**
+     * Makes a full website backup request.
+     *
+     * @return $this
+     */
     public function requestFullWebsiteBackup()
     {
-        return $this->client->request(
-            'POST',
+        return $this->post(
             $this->createPath('backup/wizard-dofullbackup.html'),
             [
                 'form_params' => [
                     'dest' => 'homedir',
                     'email_radio' => 0
-                ],
-                'debug' => $this->cpanelConfig->get('debug')
+                ]
             ]
         );
     }
 
-    public function requestDatabaseBackup()
-    {
-        return;
-    }
-
-    public function requestFileSystemBackup()
-    {
-        return;
-    }
-
     /**
      * Verify the response code is acceptable.
-     * 
-     * @param \GuzzleHttp\Psr7\\Response $response
+     *
+     * @param \GuzzleHttp\Psr7\ResponseInterface $response
      * @return boolean
      */
-    private function isResponseOk(Response $response)
+    private function isResponseOk(ResponseInterface $response)
     {
         return preg_match('/^(2|3)[0-9]{2}$/', $response->getStatusCode());
     }
 
     /**
      * Verifies required parameters are present in the config.
-     * 
+     *
      * @param Config $config
      * @return boolean
      * @throws \InvalidArgumentException
@@ -142,25 +205,81 @@ class CPanel
                 . 'password, and debug settings');
         }
 
-        return true;
+        return $this;
     }
 
     /**
+     * Makes an http request.
      *
      * @param string $method Http method.
      * @param string $path Url path segment.
      * @param array $args Http parameters as per GuzzleHttp
-     * @return HttpResponse
+     * @param callable $onSuccess Called if request was successful.
+     * @param callable $onFailure Called if request failed.
      */
-    private function request($method, $path, $args)
-    {
-        $args = array_merge(
-            $args,
-            ['debug' => $this->cpanelConfig->get('debug')]
+    private function request(
+        $method,
+        $path,
+        $args,
+        callable $onSuccess = null,
+        callable $onFailure = null
+    ) {
+        $this->lastResponse = $this->client->request(
+            $method,
+            $this->factoryPath($path),
+            array_merge($args, ['debug' => $this->config->get('debug')])
         );
 
-        $this->lastResponse = $this->client->request($method, $path, $args);
+        $result = $this->isResponseOk($this->getLastResponse()
 
-        return $this->lastResponse;
+        if ($result) {
+            $callback = $onSucces;
+        } else {
+            $callback = $onFailure;
+        }
+
+        if ($callback) {
+            call_user_func($callback, [$this->getLastResponse()]);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Extracts the path from a response to a login request.
+     *
+     * @param GuzzleHttp\Psr7\ResponseInterface $response The response received
+     *  from a login request.
+     * @return string The path with no index.html on the end.
+     */
+    private function extractLoginResponsePath(Response $response)
+    {
+        $path = (new Uri(
+            $this->lastResponse->getHeader('Location')[0]
+        ))->path;
+
+        return substr($path, 0, strrpos($path, "/"));
+    }
+
+    /**
+     * Factories a path from the path prefix set on login and the path
+     * argument.
+     *
+     * @param string $path The path to create a full path from.
+     * @return string The full path.
+     */
+    private function factoryPath($path)
+    {
+        return sprintf("/%s/%s", $this->pathPrefix, ltrim($path, '/'));
+    }
+
+    /**
+     * Sets the logged in status as true.
+     *
+     * @return void
+     */
+    private function setLoggedIn()
+    {
+        $this->loggedIn = true;
     }
 }
