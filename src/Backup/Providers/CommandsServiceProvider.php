@@ -1,6 +1,6 @@
 <?php
 
-/* 
+/*
  * Copyright (C) 2017 Chris Doherty
  *
  * This program is free software: you can redistribute it and/or modify
@@ -35,7 +35,7 @@ class CommandsServiceProvider implements ServiceProviderInterface
         $c['\Backup\Commands\CPanelBackup'] = function (Container $c) {
             return new CPanelBackupCommand(
                 $c['config.cpanel'],
-                $c['http.client']
+                $c['http.client.factory']->getInstance((array) $c['config.cpanel'])
             );
         };
 

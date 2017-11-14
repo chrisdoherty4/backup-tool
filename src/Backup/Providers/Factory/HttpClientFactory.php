@@ -19,42 +19,24 @@
 
 namespace Backup\Providers\Factory;
 
-use Pimple\Pimple;
 use GuzzleHttp\Client;
 
 /**
  * @class HttpClientFactory
- * Factories HTTP client objects. 
+ * Factories HTTP client objects.
  *
  * @author Chris Doherty <chris.doherty4@gmail.com>
  */
 class HttpClientFactory
 {
     /**
-     * The dependency container.
-     * 
-     * @var Pimple\Pimple
-     */
-    private $container = null;
-
-    /**
-     * Constructor.
-     * 
-     * @param Pimple $container
-     */
-    public function __construct(Pimple $container)
-    {
-        $this->container = $container;
-    }
-    
-    /**
      * Retrieves an instance of the HttpFactory.
      *
      * @param array $args Constructor arguments for the http client.
-     * @return HttpClien
+     * @return GuzzleHttp\ClientInterface
      */
-    public function instance(array $args)
-    {        
-        return new HttpClient($args);
+    public function getInstance(array $args)
+    {
+        return new Client($args);
     }
 }
