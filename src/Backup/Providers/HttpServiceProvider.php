@@ -30,7 +30,7 @@ use Backup\Providers\Factory\HttpClientFactory;
 class HttpServiceProvider implements ServiceProviderInterface
 {
     public function register(Container $c)
-    {        
+    {
         $c['http.client.factory'] = function (Container $c) {
             return new HttpClientFactory($c);
         };

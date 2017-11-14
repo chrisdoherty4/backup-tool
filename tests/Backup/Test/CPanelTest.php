@@ -98,7 +98,7 @@ class CPanelTest extends TestCase
                     'Location' => ''
                 ]
             ),
-            new Response (
+            new Response(
                 200,
                 [
                     'Location' => ''
