@@ -22,7 +22,7 @@ namespace Backup\CPanel;
 use Backup\CPanel\Exception\NotLoggedInException;
 use Backup\CPanel\Exception\AlreadyLoggedInException;
 use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Psr7\ResponseInterface;
+use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\Uri;
 
 /**
@@ -50,7 +50,14 @@ class CPanel
     private $password = '';
 
     /**
-     * @var GuzzleHttp\Psr7\ResponseInterface
+     * Whether the Http requests should output debug.
+     *
+     * @var boolean
+     */
+    private $debug = false;
+
+    /**
+     * @var GuzzleHttp\Psr7\Response
      */
     private $lastResponse = null;
 
@@ -85,6 +92,7 @@ class CPanel
     ) {
         $this->client = $client;
         $this->setCredentials($username, $password);
+        $this->debug = $debug;
     }
 
     /**
@@ -122,7 +130,7 @@ class CPanel
     /**
      * Retrieves the last response.
      *
-     * @return GuzzleHttp\Psr7\ResponseInterface
+     * @return GuzzleHttp\Psr7\Response
      */
     public function getLastResponse()
     {
@@ -152,12 +160,12 @@ class CPanel
     /**
      * Logs in to cPanel.
      *
-     * @return GuzzleHttp\ResponseInterface|null
+     * @return GuzzleHttp\Response
      * @throws Backup\CPanel\Exception\NotLoggedInException
      */
     public function login()
     {
-        if (!$this->isLoggedIn()) {
+        if ($this->isLoggedIn()) {
             throw new AlreadyLoggedInException();
         }
 
@@ -171,7 +179,7 @@ class CPanel
                     'goto_uri' => '/'
                 ]
             ],
-            function (Response $response) use ($this) {
+            function (Response $response) {
                 $this->path = $this->extractLoginResponsePath($response);
                 $this->setLoggedIn();
             }
@@ -181,12 +189,12 @@ class CPanel
     /**
      * Makes a full website backup request.
      *
-     * @return GuzzleHttp\ResponseInterface
+     * @return GuzzleHttp\Response
      * @throws Backup\CPanel\Exception\AlreadyLoggedInException
      */
     public function requestFullWebsiteBackup()
     {
-        if ($this->isLoggedIn()) {
+        if (!$this->isLoggedIn()) {
             throw new NotLoggedInException();
         }
 
@@ -205,10 +213,10 @@ class CPanel
     /**
      * Verify the response code is acceptable.
      *
-     * @param \GuzzleHttp\Psr7\ResponseInterface $response
+     * @param \GuzzleHttp\Psr7\Response $response
      * @return boolean
      */
-    private function isResponseOk(ResponseInterface $response)
+    private function isResponseOk(Response $response)
     {
         return preg_match('/^(2|3)[0-9]{2}$/', $response->getStatusCode());
     }
@@ -235,16 +243,16 @@ class CPanel
             array_merge($args, ['debug' => $this->debug])
         );
 
-        $result = $this->isResponseOk($this->getLastResponse()
+        $result = $this->isResponseOk($this->getLastResponse());
 
         if ($result) {
-            $callback = $onSucces;
+            $callback = $onSuccess;
         } else {
             $callback = $onFailure;
         }
 
         if ($callback) {
-            call_user_func($callback, [$this->getLastResponse()]);
+            call_user_func($callback, $this->getLastResponse());
         }
 
         return $result;
@@ -253,15 +261,15 @@ class CPanel
     /**
      * Extracts the path from a response to a login request.
      *
-     * @param GuzzleHttp\Psr7\ResponseInterface $response The response received
+     * @param GuzzleHttp\Psr7\Response $response The response received
      *  from a login request.
      * @return string The path with no index.html on the end.
      */
     private function extractLoginResponsePath(Response $response)
     {
         $path = (new Uri(
-            $this->lastResponse->getHeader('Location')[0]
-        ))->path;
+            $response->getHeader('Location')[0]
+        ))->getPath();
 
         return substr($path, 0, strrpos($path, "/"));
     }

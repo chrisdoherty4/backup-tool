@@ -40,7 +40,7 @@ class CPanelTest extends TestCase
             'password'
         );
 
-        $this->assertInstanceOf($cpanel, CPanel::class);
+        $this->assertInstanceOf(CPanel::class, $cpanel);
 
         $this->assertEquals($cpanel->getUsername(), 'user');
 
@@ -50,7 +50,12 @@ class CPanelTest extends TestCase
     public function testSuccessfulLogin()
     {
         $handler = new MockHandler([
-            new Response(200)
+            new Response(
+                200,
+                [
+                    'Location' => ''
+                ]
+            )
         ]);
 
         $client = new Client(['handler' => $handler]);
@@ -59,13 +64,20 @@ class CPanelTest extends TestCase
 
         $cpanel->login();
 
+        $this->assertEquals($cpanel->getLastResponse()->getStatusCode(), 200);
+
         $this->assertTrue($cpanel->isLoggedIn());
     }
 
     public function testFailedLogin()
     {
         $handler = new MockHandler([
-            new Response(404)
+            new Response(
+                404,
+                [
+                    'Location' => ''
+                ]
+            )
         ]);
 
         $client = new Client(['handler' => $handler]);
@@ -80,7 +92,18 @@ class CPanelTest extends TestCase
     public function testAlreadyLoggedIn()
     {
         $handler = new MockHandler([
-            new Response(404)
+            new Response(
+                200,
+                [
+                    'Location' => ''
+                ]
+            ),
+            new Response (
+                200,
+                [
+                    'Location' => ''
+                ]
+            )
         ]);
 
         $client = new Client(['handler' => $handler]);
@@ -97,7 +120,12 @@ class CPanelTest extends TestCase
     public function testFullWebsiteBackupNotLoggedIn()
     {
         $handler = new MockHandler([
-            new Response(200)
+            new Response(
+                200,
+                [
+                    'Location' => ''
+                ]
+            )
         ]);
 
         $client = new Client(['handler' => $handler]);
@@ -112,15 +140,25 @@ class CPanelTest extends TestCase
     public function testFullWebsiteBackup()
     {
         $handler = new MockHandler([
-            new Response(200),
-            new Response(200)
+            new Response(
+                200,
+                [
+                    'Location' => ''
+                ]
+            ),
+            new Response(
+                200,
+                [
+                    'Location' => ''
+                ]
+            )
         ]);
 
         $client = new Client(['handler' => $handler]);
 
         $cpanel = new CPanel($client, 'user', 'password');
 
-        $this->login();
+        $cpanel->login();
 
         $this->assertEquals($cpanel->getLastResponse()->getStatusCode(), 200);
 
