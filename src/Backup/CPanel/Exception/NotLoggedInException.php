@@ -17,19 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-require_once __DIR__ . "/../vendor/autoload.php";
+namespace Backup\CPanel\Exception;
 
 /**
- * ---------------------------------------------------------------------------
- * Load Environment
- * ---------------------------------------------------------------------------
- *
- * Load environment variables. These are used in the configuration files and
- * accessed via the <code>env()</code> function.
+ * @class NotLoggedInException
+ * @author Chris Doherty <chris.doherty4@gmail.com>
  */
-try {
-    (new \Dotenv\Dotenv(__DIR__, '.env.test'))->load();
-} catch (\Dotenv\Exception\InvalidPathException $ex) {
-    echo "Could not load environment\n";
-    exit(1);
+class NotLoggedInException extends \RuntimeException
+{
 }

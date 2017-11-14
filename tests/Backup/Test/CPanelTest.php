@@ -20,24 +20,112 @@
 namespace Backup\Test;
 
 use PHPUnit\Framework\TestCase;
-use Backup\App as BackupApplication;
-use Backup\Commands\CPanelBackup as CPanelBackupCommand;
-use Backup\Commands\Relocate as RelocateCommand;
+use Backup\CPanel\CPanel;
+use Backup\CPanel\Exception\AlreadyLoggedInException;
+use Backup\CPanel\Exception\NotLoggedInException;
+use GuzzleHttp\Client;
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Psr7\Response;
 
 class CPanelTest extends TestCase
 {
     public function testConstruction()
     {
-        $this->markTestIncomplete();
+        $client = new Client(['handler' => new MockHandler()]);
+
+        $cpanel = new CPanel(
+            $client,
+            'user',
+            'password'
+        );
+
+        $this->assertInstanceOf($cpanel, CPanel::class);
+
+        $this->assertEquals($cpanel->getUsername(), 'user');
+
+        $this->assertEquals($cpanel->getHttpClient(), $client);
     }
 
-    public function testLogin()
+    public function testSuccessfulLogin()
     {
-        $this->markTestIncomplete();
+        $handler = new MockHandler([
+            new Response(200)
+        ]);
+
+        $client = new Client(['handler' => $handler]);
+
+        $cpanel = new CPanel($client, 'user', 'password');
+
+        $cpanel->login();
+
+        $this->assertTrue($cpanel->isLoggedIn());
+    }
+
+    public function testFailedLogin()
+    {
+        $handler = new MockHandler([
+            new Response(404)
+        ]);
+
+        $client = new Client(['handler' => $handler]);
+
+        $cpanel = new CPanel($client, 'user', 'password');
+
+        $cpanel->login();
+
+        $this->assertFalse($cpanel->isLoggedIn());
+    }
+
+    public function testAlreadyLoggedIn()
+    {
+        $handler = new MockHandler([
+            new Response(404)
+        ]);
+
+        $client = new Client(['handler' => $handler]);
+
+        $cpanel = new CPanel($client, 'user', 'password');
+
+        $cpanel->login();
+
+        $this->expectException(AlreadyLoggedInException::class);
+
+        $cpanel->login();
+    }
+
+    public function testFullWebsiteBackupNotLoggedIn()
+    {
+        $handler = new MockHandler([
+            new Response(200)
+        ]);
+
+        $client = new Client(['handler' => $handler]);
+
+        $cpanel = new CPanel($client, 'user', 'password');
+
+        $this->expectException(NotLoggedInException::class);
+
+        $cpanel->requestFullWebsiteBackup();
     }
 
     public function testFullWebsiteBackup()
     {
-        $this->markTestIncomplete();
+        $handler = new MockHandler([
+            new Response(200),
+            new Response(200)
+        ]);
+
+        $client = new Client(['handler' => $handler]);
+
+        $cpanel = new CPanel($client, 'user', 'password');
+
+        $this->login();
+
+        $this->assertEquals($cpanel->getLastResponse()->getStatusCode(), 200);
+
+        $cpanel->requestFullWebsiteBackup();
+
+        $this->assertEquals($cpanel->getLastResponse()->getStatusCode(), 200);
     }
 }

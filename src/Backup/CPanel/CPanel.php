@@ -19,10 +19,11 @@
 
 namespace Backup\CPanel;
 
-use Backup\Providers\Factory\HttpClientFactory;
+use Backup\CPanel\Exception\NotLoggedInException;
+use Backup\CPanel\Exception\AlreadyLoggedInException;
+use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Psr7\ResponseInterface;
 use GuzzleHttp\Psr7\Uri;
-use PHLAK\Config\Config;
 
 /**
  * @class CPanel
@@ -37,6 +38,16 @@ class CPanel
      * @var GuzzleHttp\Client
      */
     private $client = null;
+
+    /**
+     * @var string
+     */
+    private $username = '';
+
+    /**
+     * @var string
+     */
+    private $password = '';
 
     /**
      * @var GuzzleHttp\Psr7\ResponseInterface
@@ -61,38 +72,41 @@ class CPanel
     /**
      * Constructor
      *
-     * @param HttpClientFactory $factory
-     * @param Config $config
+     * @param GuzzleHttp\ClientInterface $client The client to interface
+     *  witht he cpanel website.
+     * @param string $username The username to log in to cpanel.
+     * @param string $password The password for the $username.
      */
-    public function __construct(HttpClientFactory $factory, Config $config)
-    {
-        $this->client = $factory->instance($config);
-
-        $this->setConfig($config);
+    public function __construct(
+        ClientInterface $client,
+        $username,
+        $password,
+        $debug = false
+    ) {
+        $this->client = $client;
+        $this->setCredentials($username, $password);
     }
 
     /**
-     * Request pass through to allow $this->post(), $this->get() type calls
-     * for making http requests.
+     * Set the credentials for logging in to cPanel.
      *
-     * @param string $name The method being called.
-     * @param array $args The arguments supplied.
-     * @return mixed The return of the called function.
+     * @param string $username
+     * @param string $password
      */
-    public function __call($name, $args)
+    public function setCredentials($username, $password)
     {
-        static $allowed = ['get', 'post', 'delete', 'put'];
+        $this->username = $username;
+        $this->password = $password;
+    }
 
-        if (!in_array($name, $allowed)) {
-            trigger_error(
-                'Call to undefined method '.__CLASS__.'::'.$name.'()',
-                E_USER_ERROR
-            );
-        }
-
-        array_unshift($args, strtoupper($name));
-
-        return call_user_func([$this, $name], $args);
+    /**
+     * Retrieve the username for the cPanel interface.
+     *
+     * @return string The username.
+     */
+    public function getUsername()
+    {
+        return $this->username;
     }
 
     /**
@@ -138,16 +152,22 @@ class CPanel
     /**
      * Logs in to cPanel.
      *
-     * @return $this
+     * @return GuzzleHttp\ResponseInterface|null
+     * @throws Backup\CPanel\Exception\NotLoggedInException
      */
     public function login()
     {
-        return $this->post(
+        if (!$this->isLoggedIn()) {
+            throw new AlreadyLoggedInException();
+        }
+
+        return $this->request(
+            'POST',
             '/login',
             [
                 'form_params' => [
-                    'user' => $this->config->get('username'),
-                    'pass' => $this->config->get('password'),
+                    'user' => $this->username,
+                    'pass' => $this->password,
                     'goto_uri' => '/'
                 ]
             ],
@@ -161,12 +181,18 @@ class CPanel
     /**
      * Makes a full website backup request.
      *
-     * @return $this
+     * @return GuzzleHttp\ResponseInterface
+     * @throws Backup\CPanel\Exception\AlreadyLoggedInException
      */
     public function requestFullWebsiteBackup()
     {
-        return $this->post(
-            $this->createPath('backup/wizard-dofullbackup.html'),
+        if ($this->isLoggedIn()) {
+            throw new NotLoggedInException();
+        }
+
+        return $this->request(
+            'POST',
+            $this->factoryPath('/backup/wizard-dofullbackup.html'),
             [
                 'form_params' => [
                     'dest' => 'homedir',
@@ -188,27 +214,6 @@ class CPanel
     }
 
     /**
-     * Verifies required parameters are present in the config.
-     *
-     * @param Config $config
-     * @return boolean
-     * @throws \InvalidArgumentException
-     */
-    private function setConfig(Config $config)
-    {
-        if (
-            !$config->has('username')
-            || !$config->has('password')
-            || !$config->has('debug')
-        ) {
-            throw new \InvalidArgumentException('Config should have username, '
-                . 'password, and debug settings');
-        }
-
-        return $this;
-    }
-
-    /**
      * Makes an http request.
      *
      * @param string $method Http method.
@@ -227,7 +232,7 @@ class CPanel
         $this->lastResponse = $this->client->request(
             $method,
             $this->factoryPath($path),
-            array_merge($args, ['debug' => $this->config->get('debug')])
+            array_merge($args, ['debug' => $this->debug])
         );
 
         $result = $this->isResponseOk($this->getLastResponse()
