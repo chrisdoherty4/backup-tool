@@ -34,8 +34,7 @@ class CommandsServiceProvider implements ServiceProviderInterface
     {
         $c['\Backup\Commands\CPanelBackup'] = function (Container $c) {
             return new CPanelBackupCommand(
-                $c['config.cpanel'],
-                $c['http.client.factory']->getInstance((array) $c['config.cpanel'])
+                $c['cpanel']
             );
         };
 

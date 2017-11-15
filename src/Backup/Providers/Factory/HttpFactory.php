@@ -22,20 +22,20 @@ namespace Backup\Providers\Factory;
 use GuzzleHttp\Client;
 
 /**
- * @class HttpClientFactory
- * Factories HTTP client objects.
+ * @class Httpactory
+ * Factories HTTP objects.
  *
  * @author Chris Doherty <chris.doherty4@gmail.com>
  */
-class HttpClientFactory
+class HttpFactory
 {
     /**
-     * Retrieves an instance of the HttpFactory.
+     * Retrieves an instance of the an Http Client.
      *
      * @param array $args Constructor arguments for the http client.
      * @return GuzzleHttp\ClientInterface
      */
-    public function getInstance(array $args)
+    public function getClientInstance(array $args)
     {
         return new Client($args);
     }
