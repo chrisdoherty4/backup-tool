@@ -47,6 +47,28 @@ class CPanelTest extends TestCase
         $this->assertEquals($cpanel->getHttpClient(), $client);
     }
 
+    public function testLastResponse()
+    {
+        $expectedResponse = new Response(
+            200,
+            [
+                'Location' => ''
+            ]
+        );
+
+        $handler = new MockHandler([$expectedResponse]);
+
+        $client = new Client(['handler' => $handler]);
+
+        $cpanel = new CPanel($client, 'user', 'password');
+
+        $cpanel->login();
+
+        $lastResponse = $cpanel->getLastResponse();
+
+        $this->assertEquals($expectedResponse, $lastResponse);
+    }
+
     public function testSuccessfulLogin()
     {
         $handler = new MockHandler([
@@ -62,9 +84,7 @@ class CPanelTest extends TestCase
 
         $cpanel = new CPanel($client, 'user', 'password');
 
-        $cpanel->login();
-
-        $this->assertEquals($cpanel->getLastResponse()->getStatusCode(), 200);
+        $this->assertTrue($cpanel->login());
 
         $this->assertTrue($cpanel->isLoggedIn());
     }
@@ -84,7 +104,7 @@ class CPanelTest extends TestCase
 
         $cpanel = new CPanel($client, 'user', 'password');
 
-        $cpanel->login();
+        $this->assertFalse($cpanel->login());
 
         $this->assertFalse($cpanel->isLoggedIn());
     }
@@ -165,5 +185,18 @@ class CPanelTest extends TestCase
         $cpanel->requestFullWebsiteBackup();
 
         $this->assertEquals($cpanel->getLastResponse()->getStatusCode(), 200);
+    }
+
+    public function testIsResponseOk()
+    {
+        $cpanel = new CPanel(new Client(), 'user', 'password');
+
+        $this->assertFalse($cpanel->isResponseOk(new Response(199)));
+
+        for ($i = 200; $i < 400; ++$i) {
+            $this->assertTrue($cpanel->isResponseOk(new Response($i)));
+        }
+
+        $this->assertFalse($cpanel->isResponseOk(new Response(400)));
     }
 }

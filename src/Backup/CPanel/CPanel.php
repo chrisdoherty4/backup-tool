@@ -19,6 +19,7 @@
 
 namespace Backup\CPanel;
 
+use Backup\CPanel\CPanelInterface;
 use Backup\CPanel\Exception\NotLoggedInException;
 use Backup\CPanel\Exception\AlreadyLoggedInException;
 use GuzzleHttp\ClientInterface;
@@ -32,7 +33,7 @@ use GuzzleHttp\Psr7\Uri;
  *
  * @author Chris Doherty <chris.doherty4@gmail.com>
  */
-class CPanel
+class CPanel implements CPanelInterface
 {
     /**
      * @var GuzzleHttp\Client
@@ -138,16 +139,6 @@ class CPanel
     }
 
     /**
-     * Retrieves the configuration object.
-     *
-     * @return PHLAK\Config\Config
-     */
-    public function getConfig()
-    {
-        return $this->config;
-    }
-
-    /**
      * Determines if a successful login has been performed.
      *
      * @return bool
@@ -169,7 +160,7 @@ class CPanel
             throw new AlreadyLoggedInException();
         }
 
-        return $this->request(
+        $result = $this->request(
             'POST',
             '/login',
             [
@@ -178,12 +169,15 @@ class CPanel
                     'pass' => $this->password,
                     'goto_uri' => '/'
                 ]
-            ],
-            function (Response $response) {
-                $this->path = $this->extractLoginResponsePath($response);
-                $this->setLoggedIn();
-            }
+            ]
         );
+
+        if ($result) {
+            $this->path = $this->extractLoginResponsePath($this->lastResponse);
+            $this->setLoggedIn();
+        }
+
+        return $result;
     }
 
     /**
@@ -213,12 +207,15 @@ class CPanel
     /**
      * Verify the response code is acceptable.
      *
-     * @param \GuzzleHttp\Psr7\Response $response
+     * @param GuzzleHttp\Psr7\Response $response
      * @return boolean
      */
-    private function isResponseOk(Response $response)
+    public function isResponseOk(Response $response)
     {
-        return preg_match('/^(2|3)[0-9]{2}$/', $response->getStatusCode());
+        return preg_match(
+            '/^(2|3)[0-9]{2}$/',
+            $response->getStatusCode()
+        ) === 1;
     }
 
     /**
@@ -227,15 +224,11 @@ class CPanel
      * @param string $method Http method.
      * @param string $path Url path segment.
      * @param array $args Http parameters as per GuzzleHttp
-     * @param callable $onSuccess Called if request was successful.
-     * @param callable $onFailure Called if request failed.
      */
     private function request(
         $method,
         $path,
-        $args,
-        callable $onSuccess = null,
-        callable $onFailure = null
+        $args
     ) {
         $this->lastResponse = $this->client->request(
             $method,
@@ -243,19 +236,7 @@ class CPanel
             array_merge($args, ['debug' => $this->debug])
         );
 
-        $result = $this->isResponseOk($this->getLastResponse());
-
-        if ($result) {
-            $callback = $onSuccess;
-        } else {
-            $callback = $onFailure;
-        }
-
-        if ($callback) {
-            call_user_func($callback, $this->getLastResponse());
-        }
-
-        return $result;
+        return $this->isResponseOk($this->lastResponse);
     }
 
     /**
