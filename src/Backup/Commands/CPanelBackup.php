@@ -79,15 +79,15 @@ class CPanelBackup extends AbstractCommand
 
         $output->writeln("<info>Logging in to CPanel interface.</>");
 
-        $response = $this->cpanel->login();
+        $result = $this->cpanel->login();
 
-        if ($this->cpanel->isResponseOk($response)) {
+        if ($result) {
             $output->writeln("<info>Successfully logged in.</>");
             $output->writeln("<info>Requesting backup to home directory.</>");
 
-            $response = $this->cpanel->requestFullWebsiteBackup();
+            $result = $this->cpanel->requestFullWebsiteBackup();
 
-            if ($this->cpanel->isResponseOk($response)) {
+            if ($result) {
                 $output->writeln(
                     "<info>Successfully requested backup. Backups"
                     . " take time to complete so may not appear instantly.</>"

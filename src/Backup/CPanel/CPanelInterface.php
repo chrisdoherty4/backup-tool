@@ -65,7 +65,7 @@ interface CPanelInterface
     /**
      * Retrieves the last response.
      *
-     * @return Respose The last response recived by the last http request.
+     * @return Response The last response recived by the last http request.
      */
     public function getLastResponse();
 

@@ -202,7 +202,7 @@ class CPanel implements CPanelInterface
     /**
      * Verify the response code is acceptable.
      *
-     * @param GuzzleHttp\Psr7\Response $response
+     * @param Response $response
      * @return boolean
      */
     public function isResponseOk(Response $response)
