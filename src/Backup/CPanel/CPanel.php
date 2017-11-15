@@ -151,7 +151,7 @@ class CPanel implements CPanelInterface
     /**
      * Logs in to cPanel.
      *
-     * @return GuzzleHttp\Response
+     * @return boolean True if successful, else false.
      * @throws Backup\CPanel\Exception\NotLoggedInException
      */
     public function login()
@@ -173,7 +173,7 @@ class CPanel implements CPanelInterface
         );
 
         if ($result) {
-            $this->path = $this->extractLoginResponsePath($this->lastResponse);
+            $this->pathPrefix = $this->extractLoginResponsePath($this->lastResponse);
             $this->setLoggedIn();
         }
 
@@ -183,7 +183,7 @@ class CPanel implements CPanelInterface
     /**
      * Makes a full website backup request.
      *
-     * @return GuzzleHttp\Response
+     * @return boolean True if successful, else false.
      * @throws Backup\CPanel\Exception\AlreadyLoggedInException
      */
     public function requestFullWebsiteBackup()
