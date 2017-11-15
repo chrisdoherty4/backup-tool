@@ -68,11 +68,6 @@ class CPanel implements CPanelInterface
     private $loggedIn = false;
 
     /**
-     * @var PHLAK\Config\Config
-     */
-    private $config = null;
-
-    /**
      * @var string
      */
     private $pathPrefix = '';

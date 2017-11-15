@@ -29,14 +29,14 @@ interface CPanelInterface
     /**
      * Request a login to the CPanel website.
      *
-     * @return GResponse
+     * @return boolean
      */
     public function login();
 
     /**
      * Request a full website backup.
      *
-     * @return Response
+     * @return boolean
      */
     public function requestFullWebsiteBackup();
 
@@ -44,14 +44,14 @@ interface CPanelInterface
      * Check if a response is considered Ok.
      *
      * @param Response $response The resposne to check.
-     * @return boolean [description]
+     * @return boolean True if Ok, else false.
      */
     public function isResponseOk(Response $response);
 
     /**
      * Retrieves the HttpClient the object wraps around.#
      *
-     * @return GuzzleHttp\ClientInterface
+     * @return ClientInterface
      */
     public function getHttpClient();
 
