@@ -22,9 +22,6 @@ namespace Backup\Commands;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Backup\CPanel\CPanelInterface;
-use GuzzleHttp\Client as HttpClient;
-use GuzzleHttp\Psr7\Response as HttpResponse;
-use PHLAK\Config\Config;
 
 /**
  * @class CPanelBackup
@@ -47,9 +44,8 @@ class CPanelBackup extends AbstractCommand
      * Constructor.
      * @param CPanel $cpanel The CPanel interface to a CPanel website.
      */
-    public function __construct(
-        CPanelInterface $cpanel
-    ) {
+    public function __construct(CPanelInterface $cpanel)
+    {
         parent::__construct();
 
         $this->cpanel = $cpanel;
