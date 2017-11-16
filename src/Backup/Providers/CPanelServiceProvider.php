@@ -38,7 +38,8 @@ class CPanelServiceProvider implements ServiceProviderInterface
                     arrayaccess_to_array($c['config.cpanel'])
                 ),
                 $c['config.cpanel']['username'],
-                $c['config.cpanel']['password']
+                $c['config.cpanel']['password'],
+                $c['config.cpanel']['debug']
             );
         };
     }
