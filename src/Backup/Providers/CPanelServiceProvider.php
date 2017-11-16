@@ -34,9 +34,11 @@ class CPanelServiceProvider implements ServiceProviderInterface
     {
         $c['cpanel'] = function (Container $c) {
             return new CPanel(
-                $c['http.factory']->getClientInstance(
-                    arrayaccess_to_array($c['config.cpanel'])
-                ),
+                $c['http.factory']->getClientInstance([
+                    'base_uri' => $c['config.cpanel']['uri'],
+                    'allow_redirects' => false,
+                    'cookies' => true
+                ]),
                 $c['config.cpanel']['username'],
                 $c['config.cpanel']['password'],
                 $c['config.cpanel']['debug']

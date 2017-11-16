@@ -227,7 +227,7 @@ class CPanel implements CPanelInterface
     ) {
         $this->lastResponse = $this->client->request(
             $method,
-            $this->factoryPath($path),
+            $path,
             array_merge($args, ['debug' => $this->debug])
         );
 
