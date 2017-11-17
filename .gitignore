@@ -3,3 +3,4 @@ composer.lock
 /nbproject
 **/*~
 **/.env
+.ftpquota
