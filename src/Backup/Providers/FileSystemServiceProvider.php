@@ -21,7 +21,7 @@ namespace Backup\Providers;
 
 use \Pimple\ServiceProviderInterface;
 use \Pimple\Container;
-use \Backup\Providers\FileSystem\MountManager;
+use \Backup\FileSystem\MountManager;
 
 /**
  * @class FileSystemServiceProvider

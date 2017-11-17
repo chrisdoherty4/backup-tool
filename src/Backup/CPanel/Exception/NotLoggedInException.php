@@ -17,22 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Backup\Providers;
-
-use Pimple\Container;
-use Pimple\ServiceProviderInterface;
-use Backup\Providers\Factory\HttpFactory;
+namespace Backup\CPanel\Exception;
 
 /**
- * @class HttpServiceProvider
- * @author Chris Dohety <chris.doherty4@gmail.com>
+ * @class NotLoggedInException
+ * @author Chris Doherty <chris.doherty4@gmail.com>
  */
-class HttpServiceProvider implements ServiceProviderInterface
+class NotLoggedInException extends \RuntimeException
 {
-    public function register(Container $c)
-    {
-        $c['http.factory'] = function (Container $c) {
-            return new HttpFactory($c);
-        };
-    }
 }

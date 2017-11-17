@@ -17,22 +17,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Backup\Providers;
+namespace Backup\Providers\Factory;
 
-use Pimple\Container;
-use Pimple\ServiceProviderInterface;
-use Backup\Providers\Factory\HttpFactory;
+use GuzzleHttp\Client;
 
 /**
- * @class HttpServiceProvider
- * @author Chris Dohety <chris.doherty4@gmail.com>
+ * @class Httpactory
+ * Factories HTTP objects.
+ *
+ * @author Chris Doherty <chris.doherty4@gmail.com>
  */
-class HttpServiceProvider implements ServiceProviderInterface
+class HttpFactory
 {
-    public function register(Container $c)
+    /**
+     * Retrieves an instance of the an Http Client.
+     *
+     * @param array $args Constructor arguments for the http client.
+     * @return GuzzleHttp\ClientInterface
+     */
+    public function getClientInstance(array $args)
     {
-        $c['http.factory'] = function (Container $c) {
-            return new HttpFactory($c);
-        };
+        return new Client($args);
     }
 }

@@ -19,11 +19,9 @@
 
 namespace Backup\Commands;
 
-use \Symfony\Component\Console\Input\InputInterface;
-use \Symfony\Component\Console\Output\OutputInterface;
-use \GuzzleHttp\Client as HttpClient;
-use \GuzzleHttp\Psr7\Response as HttpResponse;
-use \PHLAK\Config\Config;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use Backup\CPanel\CPanelInterface;
 
 /**
  * @class CPanelBackup
@@ -37,42 +35,22 @@ use \PHLAK\Config\Config;
  */
 class CPanelBackup extends AbstractCommand
 {
-    
     /**
-     * The guzzle client used to log in to the CPanel interface.
-     *
-     * @var \GuzzlHttp\Client
+     * @var CPanelInterface
      */
-    private $httpClient;
-    
-    /**
-     *
-     * @var Config Object
-     */
-    private $cpanelConfig;
-    
-    /**
-     * The path of the website we're interfacing with. This is gathered from
-     * the response of our login request.
-     *
-     * @var string
-     */
-    private $path;
+    private $cpanel = null;
 
     /**
-     * @param Config     $config
-     * @param HttpClient $client
+     * Constructor.
+     * @param CPanel $cpanel The CPanel interface to a CPanel website.
      */
-    public function __construct(
-        Config $config,
-        HttpClient $client
-    ) {
+    public function __construct(CPanelInterface $cpanel)
+    {
         parent::__construct();
-        
-        $this->cpanelConfig = $config;
-        $this->httpClient = $client;
+
+        $this->cpanel = $cpanel;
     }
-    
+
     /**
      * Configures the command object.
      *
@@ -87,7 +65,7 @@ class CPanelBackup extends AbstractCommand
                 . ' backup in the home directory.'
             );
     }
-    
+
     /**
      * Logs in to cPanel and requests a backup be created to the home directory.
      *
@@ -98,20 +76,18 @@ class CPanelBackup extends AbstractCommand
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $output->writeln($this->getHeader());
-        
+
         $output->writeln("<info>Logging in to CPanel interface.</>");
-        
-        $response = $this->login();
-        $statusCode = $response->getStatusCode();
-        
-        if ($statusCode >= 200 && $statusCode < 400) {
+
+        $result = $this->cpanel->login();
+
+        if ($result) {
             $output->writeln("<info>Successfully logged in.</>");
-            
-            $this->path = $this->extractLoginResponsePath($response);
-            
             $output->writeln("<info>Requesting backup to home directory.</>");
-            
-            if ($this->createBackup()->getStatusCode() == 200) {
+
+            $result = $this->cpanel->requestFullWebsiteBackup();
+
+            if ($result) {
                 $output->writeln(
                     "<info>Successfully requested backup. Backups"
                     . " take time to complete so may not appear instantly.</>"
@@ -128,76 +104,5 @@ class CPanelBackup extends AbstractCommand
                 . "supplied credentials in the .env.cpanelbackup file.</>"
             );
         }
-    }
-    
-    /**
-     * Logs in to the CPanel interface using the http client and defined
-     * environment variables.
-     *
-     * @return \GuzzleHttp\Response
-     */
-    private function login()
-    {
-        return $this->httpClient->request(
-            'POST',
-            '/login',
-            [
-            'form_params' => [
-                'user' => $this->cpanelConfig->get('username'),
-                'pass' => $this->cpanelConfig->get('password'),
-                'goto_uri' => '/'
-            ],
-            'debug' => $this->cpanelConfig->get('debug')
-            ]
-        );
-    }
-    
-    /**
-     * Submits the CPanel backup request and asks CPanel to push the backup
-     * to an FTP server.
-     *
-     * @return \GuzzleHttp\Response
-     */
-    private function createBackup()
-    {
-        return $this->httpClient->request(
-            'POST',
-            $this->createPath('backup/wizard-dofullbackup.html'),
-            [
-                'form_params' => [
-                    'dest' => 'homedir',
-                    'email_radio' => 0
-                ],
-                'debug' => $this->cpanelConfig->get('debug')
-            ]
-        );
-    }
-    
-    /**
-     * Retrieves a full path including the extension retrieved from the initial
-     * response when we logged into CPanel.
-     *
-     * @param  string $extension
-     * @return string
-     */
-    private function createPath($extension)
-    {
-        return sprintf("%s/%s", $this->path, $extension);
-    }
-    
-    /**
-     * This function expects the initial response from a CPanel login as the
-     * redirect or location will merely be to the index.php page. This function
-     * extracts the path excluding the index.php segment so we can use it when
-     * submitting a request for backup.
-     *
-     * @param  HttpResponse $response The http response received from a CPanel
-     *                                login.
-     * @return string
-     */
-    private function extractLoginResponsePath(HttpResponse $response)
-    {
-        $path = (new \Purl\Url($response->getHeader('Location')[0]))->path;
-        return substr($path, 0, strrpos($path, "/"));
     }
 }

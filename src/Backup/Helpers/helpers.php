@@ -1,6 +1,6 @@
 <?php
 
-/* 
+/*
  * Copyright (C) 2017 Chris Doherty
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
  */
 
 if (!function_exists('env')) {
-    
+
     /**
      * Retrieves an environment variable with an optional default should the
      * variable not exist.
@@ -30,11 +30,11 @@ if (!function_exists('env')) {
     function env($key, $default = null)
     {
         $value = getenv($key);
-        
+
         if ($value === false) {
             $value = $default;
         }
-        
+
         switch (strtolower($value)) {
             case "true":
                 $value = true;
@@ -46,14 +46,14 @@ if (!function_exists('env')) {
                 $value = null;
                 break;
         }
-        
+
         return $value;
     }
-    
+
 }
 
 if (!function_exists('base_path')) {
-    
+
     /**
      * Creates an absolute path to the root application directory.
      *
@@ -69,13 +69,13 @@ if (!function_exists('base_path')) {
         if (!$base) {
             $base = realpath(__DIR__ . '/../../..');
         }
-        
+
         return sprintf("%s%s", $base, rtrim($path, '/'));
     }
 }
 
 if (!function_exists('config_path')) {
-    
+
     /**
      * Creates a path to the config directory with an optional extension.
      *
@@ -87,5 +87,26 @@ if (!function_exists('config_path')) {
     function config_path($path = "")
     {
         return base_path("/config" . $path);
+    }
+}
+
+if (!function_exists('arrayaccess_to_array')) {
+
+    /**
+     * Consumes an ArrayAccess object and returns a raw array containing the
+     * same key => value pairs.
+     *
+     * @param ArrayAccess $object The array to be converted
+     * @return array The converted ArrayAccess raw array.
+     */
+    function arrayaccess_to_array(ArrayAccess $object)
+    {
+        $array = array();
+
+        foreach ($object as $k => $v) {
+            $array[$k] = $v;
+        }
+
+        return $array;
     }
 }

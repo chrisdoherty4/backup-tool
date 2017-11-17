@@ -1,6 +1,7 @@
 <?php
+use Backup\Providers\CPanelServiceProvider;
 
-/* 
+/*
  * Copyright (C) 2017 Chris Doherty
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,8 +19,9 @@
  */
 
 return [
-    new \Backup\Providers\ConfigServiceProvider(),
-    new \Backup\Providers\HttpServiceProvider(),
-    new \Backup\Providers\FileSystemServiceProvider(),
-    new \Backup\Providers\CommandsServiceProvider()
+    new Backup\Providers\ConfigServiceProvider(),
+    new Backup\Providers\HttpServiceProvider(),
+    new Backup\Providers\FileSystemServiceProvider(),
+    new Backup\Providers\CPanelServiceProvider(),
+    new Backup\Providers\CommandsServiceProvider()
 ];

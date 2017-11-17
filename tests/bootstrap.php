@@ -28,7 +28,7 @@ require_once __DIR__ . "/../vendor/autoload.php";
  * accessed via the <code>env()</code> function.
  */
 try {
-    (new \Dotenv\Dotenv(__DIR__))->load();
+    (new \Dotenv\Dotenv(__DIR__, '.env.test'))->load();
 } catch (\Dotenv\Exception\InvalidPathException $ex) {
     echo "Could not load environment\n";
     exit(1);

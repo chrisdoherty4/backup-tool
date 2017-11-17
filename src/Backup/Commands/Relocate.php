@@ -1,6 +1,6 @@
 <?php
 
-/* 
+/*
  * Copyright (C) 2017 Chris Doherty
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,7 +22,7 @@ namespace Backup\Commands;
 use \Symfony\Component\Console\Input\InputInterface;
 use \Symfony\Component\Console\Output\OutputInterface;
 use \Symfony\Component\Console\Input\InputArgument;
-use \Backup\Providers\FileSystem\MountManager;
+use \Backup\FileSystem\MountManager;
 
 /**
  * @class Relocate
@@ -49,7 +49,7 @@ class Relocate extends AbstractCommand
         array $ftpConfig
     ) {
         parent::__construct();
-        
+
         $this->mountManager = $mountManager;
 
         $this->mountManager->mountFilesystem(
@@ -85,7 +85,7 @@ class Relocate extends AbstractCommand
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $output->writeln($this->getHeader());
-        
+
         $path = $input->getArgument('backup_path');
 
         $base = $this->extractParentPath($path);
@@ -99,9 +99,9 @@ class Relocate extends AbstractCommand
             $output->writeln("<error>The path provided is invalid</>");
             return;
         }
-        
+
         $backups = $this->getBackups($path);
-        
+
         $total = count($backups);
 
         $output->writeln(
@@ -152,7 +152,7 @@ class Relocate extends AbstractCommand
                 $path = substr($path, strrpos($path, '/')+1, strlen($path));
             }
         );
-        
+
         return $backups;
     }
 

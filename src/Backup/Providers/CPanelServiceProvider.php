@@ -21,18 +21,28 @@ namespace Backup\Providers;
 
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
-use Backup\Providers\Factory\HttpFactory;
+use Backup\Providers\Factory\HttpClientFactory;
+use Backup\CPanel\CPanel;
 
 /**
- * @class HttpServiceProvider
+ * @class CPanelServiceProvider
  * @author Chris Dohety <chris.doherty4@gmail.com>
  */
-class HttpServiceProvider implements ServiceProviderInterface
+class CPanelServiceProvider implements ServiceProviderInterface
 {
     public function register(Container $c)
     {
-        $c['http.factory'] = function (Container $c) {
-            return new HttpFactory($c);
+        $c['cpanel'] = function (Container $c) {
+            return new CPanel(
+                $c['http.factory']->getClientInstance([
+                    'base_uri' => $c['config.cpanel']['uri'],
+                    'allow_redirects' => false,
+                    'cookies' => true
+                ]),
+                $c['config.cpanel']['username'],
+                $c['config.cpanel']['password'],
+                $c['config.cpanel']['debug']
+            );
         };
     }
 }
