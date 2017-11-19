@@ -1,6 +1,6 @@
 <?php
 
-/* 
+/*
  * Copyright (C) 2017 Chris Doherty
  *
  * This program is free software: you can redistribute it and/or modify
@@ -23,10 +23,10 @@ require_once __DIR__ . "/../vendor/autoload.php";
  * ---------------------------------------------------------------------------
  * Load Environment
  * ---------------------------------------------------------------------------
- * 
- * Load environment variables. These are used in the configuration files and 
+ *
+ * Load environment variables. These are used in the configuration files and
  * accessed via the <code>env()</code> function.
- * 
+ *
  * @todo what shall we do if an exception is thrown?
  */
 try {
@@ -39,7 +39,7 @@ try {
  * ---------------------------------------------------------------------------
  * Create Console Application
  * ---------------------------------------------------------------------------
- * 
+ *
  * Define the console application. This is essentially a Cilex app that feeds
  * off Symfony with some added magic.
  */
@@ -49,8 +49,8 @@ $app = new \Backup\App("Backup Tool");
  * ---------------------------------------------------------------------------
  * Register Service Providers
  * ---------------------------------------------------------------------------
- * 
- * Register our service providers. The service providers are ordered such 
+ *
+ * Register our service providers. The service providers are ordered such
  * that dependencies are fulfilled.
  */
 $app->registerMultiple(require base_path('/bootstrap/providers.php'));
@@ -59,8 +59,8 @@ $app->registerMultiple(require base_path('/bootstrap/providers.php'));
  * ---------------------------------------------------------------------------
  * Boot App
  * ---------------------------------------------------------------------------
- * 
- * Now we want to boot the application so the service providers register each 
+ *
+ * Now we want to boot the application so the service providers register each
  * of their respective services. This is important as we're adding commands
  * next that have dependencies.
  */
@@ -73,8 +73,8 @@ $app->boot();
  *
  * Lets register the commands we expet for the application.
  */
-$app->command($app['\Backup\Commands\CPanelBackup']);
-$app->command($app['\Backup\Commands\Relocate']);
+$app->command($app['Backup\Commands\CPanelBackup']);
+$app->command($app['Backup\Commands\Relocate']);
 
 
 return $app;
