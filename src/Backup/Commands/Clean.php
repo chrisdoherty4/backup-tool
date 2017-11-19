@@ -19,6 +19,7 @@
 
 namespace Backup\Commands;
 
+use Backup\Cleaner\FilesystemCleanerInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -29,12 +30,13 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class Clean extends AbstractCommand
 {
-    /**
-     *
-     */
-    public function __construct()
+    private $cleaner = null;
+
+    public function __construct(FilesystemCleanerInterface $cleaner)
     {
         parent::__construct();
+
+        $this->cleaner = $cleaner;
     }
 
     /**
@@ -62,5 +64,7 @@ class Clean extends AbstractCommand
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $output->writeln($this->getHeader());
+
+        $this->cleaner->clean();
     }
 }

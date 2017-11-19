@@ -17,12 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Backup\Cleanup;
+namespace Backup\Cleaner;
 
+use Backup\Cleaner\Exception\MisconfiguredException;
 use DateTime;
+use DateTimeZone;
 use InvalidArgumentException;
 use League\Flysystem\Filesystem;
-use Backup\Cleaner\FilesystemCleanerInterface;
 
 /**
  * @class Cleanup
@@ -34,7 +35,7 @@ class FilesystemCleaner extends Filesystem implements FilesystemCleanerInterface
      * The uper limit of backups to keep.
      * @var int
      */
-    private $keep = 1;
+    private $keep = 0;
 
     /**
      * The date after which backups should be kept.
@@ -47,6 +48,12 @@ class FilesystemCleaner extends Filesystem implements FilesystemCleanerInterface
      * @var string
      */
     private $regex = '/(.*)/';
+
+    /**
+     * The numebr of backups kept.
+     * @var int
+     */
+    private $kept = 0;
 
     /**
      * Sets the regex for identifying backups to be considered for cleaning.
@@ -64,7 +71,7 @@ class FilesystemCleaner extends Filesystem implements FilesystemCleanerInterface
      * backup and working backwards.
      *
      * @param int $count The number of backpups to keep.
-     * @return void
+     * @return $this
      */
     public function keep($count)
     {
@@ -72,14 +79,16 @@ class FilesystemCleaner extends Filesystem implements FilesystemCleanerInterface
             throw new InvalidArgumentException('$count must be an int');
         }
 
-        $this->keep = $keep;
+        $this->keep = $count;
+
+        return $this;
     }
 
     /**
      * Specifies a date from which to keep backups.
      *
      * @param DateTime $date The date from which we should keep backups.
-     * @return void
+     * @return $this
      */
     public function keepAfter(DateTime $date)
     {
@@ -92,24 +101,97 @@ class FilesystemCleaner extends Filesystem implements FilesystemCleanerInterface
         }
 
         $this->keepAfter = $date;
+
+        return $this;
     }
 
     /**
-     * Performs the clean of backup files.
+     * Performs the clean of files by checking if 1) the keep counter has
+     * been reached and 2) the file is within the keep after datetime.
      *
      * @return int The number of items cleaned.
      */
     public function clean()
     {
-        // Get files
-        // Iterate over files and test if we should keep it.
-        // If not, delete.
-        // Increment files deleted counter.
-        // Return files deleted.
+        if ($this->keep == 0 && !$this->keepAfter) {
+            throw new MisconfiguredException("Total number of items to keep, "
+            ."or keepa fter date must be set");
+        }
+
+        $files = $this->listContents();
+
+        usort($files, function ($a, $b) {
+            return $a['timestamp'] > $b['timestamp'] ? -1 : 1;
+        });
+
+        $cleaned = 0;
+
+        foreach ($files as $file) {
+            if (preg_match($this->regex, $file['basename'])) {
+                if (!$this->shouldKeep($file['path'])) {
+                    $this->delete($file['path']);
+                    $cleaned+= 1;
+                }
+            }
+        }
+
+        return $cleaned;
     }
 
-    private function shouldKeep($file)
+    /**
+     * {@inheritDoc}
+     */
+    public function getKeep()
     {
+        return $this->keep;
+    }
 
+    /**
+     * {@inheritDoc}
+     */
+    public function getKeepAfter()
+    {
+        return $this->keepAfter;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getFileRegex()
+    {
+        return $this->regex;
+    }
+
+    private function shouldKeep($path)
+    {
+        return $this->isLaterThanKeepAfter($path)
+            && $this->isKeepCountReached();
+    }
+
+    private function isLaterThanKeepAfter($path)
+    {
+        $result = true;
+
+        if ($this->keepAfter) {
+            if (!is_string($path)) {
+                throw new InvalidargumentException('$path should be a string');
+            }
+
+            $datetime = new DateTime('@'.$this->getTimestamp($path));
+
+            $result = $datetime > $this->keepAfter;
+        }
+
+        return $result;
+    }
+
+    private function isKeepCountReached()
+    {
+        return $this->keep < $this->kept;
+    }
+
+    private function incrementKeptBackups()
+    {
+        $this->backupsKept+= 1;
     }
 }

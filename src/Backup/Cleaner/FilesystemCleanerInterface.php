@@ -58,4 +58,24 @@ interface FilesystemCleanerInterface
      * @return int The number of items cleaned.
      */
     public function clean();
+
+    /**
+     * Retrieves the file regex string.
+     * @return string
+     */
+    public function getFileRegex();
+
+    /**
+     * Retrieve the keep count limit.
+     *
+     * @return int
+     */
+    public function getKeep();
+
+    /**
+     * Retrieve the keep after datetime.
+     *
+     * @return DateTime
+     */
+    public function getKeepAfter();
 }

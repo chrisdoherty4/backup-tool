@@ -23,6 +23,8 @@ use \Pimple\ServiceProviderInterface;
 use \Pimple\Container;
 use \Backup\Commands\CPanelBackup as CPanelBackupCommand;
 use \Backup\Commands\Relocate as RelocateCommand;
+use Backup\Commands\Clean as CleanCommand;
+use Backup\Cleaner\FilesystemCleaner;
 
 /**
  * @class CommandsServiceProvider
@@ -33,15 +35,29 @@ class CommandsServiceProvider implements ServiceProviderInterface
     public function register(Container $c)
     {
         $c['Backup\Commands\CPanelBackup'] = function (Container $c) {
-            return new CPanelBackupCommand(
-                $c['cpanel']
-            );
+            return new CPanelBackupCommand($c['cpanel']);
         };
 
         $c['Backup\Commands\Relocate'] = function (Container $c) {
             return new RelocateCommand(
                 $c['filesystem.mount_manager'],
                 $c['config.relocate']['ftp']
+            );
+        };
+
+        $c['Backup\Commands\Clean'] = function (Container $c) {
+            return new CleanCommand(
+                new FilesystemCleaner(
+                    new \League\Flysystem\Adapter\Ftp(
+                        [
+                        'host' => $c['config.relocate']['ftp']['host'],
+                        'username' => $c['config.relocate']['ftp']['username'],
+                        'password' => $c['config.relocate']['ftp']['password'],
+                        'port' => $c['config.relocate']['ftp']['port'],
+                        'passive' => $c['config.relocate']['ftp']['passive']
+                        ]
+                    )
+                )
             );
         };
     }
