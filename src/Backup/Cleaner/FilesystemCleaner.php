@@ -19,35 +19,31 @@
 
 namespace Backup\Cleaner;
 
-use Backup\Cleaner\Exception\MisconfiguredException;
+
 use DateTime;
 use DateTimeZone;
 use InvalidArgumentException;
-use League\Flysystem\Filesystem;
+use ArrayIterator;
+use League\Flysystem\FilesystemInterface;
 
 /**
  * @class Cleanup
  * @author Chris Doherty <chris.doherty4@gmail.com>
  */
-class FilesystemCleaner extends Filesystem implements FilesystemCleanerInterface
+class FilesystemCleaner implements FilesystemCleanerInterface
 {
+    /**
+     * The file system we're cleaning.
+     *
+     * @var FilesystemInterface
+     */
+    private $filesystem = null;
+
     /**
      * The uper limit of backups to keep.
      * @var int
      */
-    private $keep = 0;
-
-    /**
-     * The date after which backups should be kept.
-     * @var DateTime
-     */
-    private $keepAfter = null;
-
-    /**
-     * The regex used to identify backups.
-     * @var string
-     */
-    private $regex = '/(.*)/';
+    private $keepCount = null;
 
     /**
      * The numebr of backups kept.
@@ -55,54 +51,14 @@ class FilesystemCleaner extends Filesystem implements FilesystemCleanerInterface
      */
     private $kept = 0;
 
-    /**
-     * Sets the regex for identifying backups to be considered for cleaning.
-     *
-     * @param string $regex
-     * @return void
-     */
-    public function setFileRegex($regex)
-    {
-        $this->regex = $regex;
-    }
-
-    /**
-     * Specifies the number of backups to keep starting with the latest
-     * backup and working backwards.
-     *
-     * @param int $count The number of backpups to keep.
-     * @return $this
-     */
-    public function keep($count)
-    {
-        if (!is_int($count)) {
-            throw new InvalidArgumentException('$count must be an int');
-        }
-
-        $this->keep = $count;
-
-        return $this;
-    }
-
-    /**
-     * Specifies a date from which to keep backups.
-     *
-     * @param DateTime $date The date from which we should keep backups.
-     * @return $this
-     */
-    public function keepAfter(DateTime $date)
-    {
-        $current = new DateTime();
-
-        if ($date > $current) {
-            throw InvalidArgumentException(
-                '$date cannot be later than current date-time'
-            );
-        }
-
-        $this->keepAfter = $date;
-
-        return $this;
+    public function __construct(
+        FilesystemInterface $filesystem,
+        FileMatcherInterface $matcher,
+        $keepCount
+    ) {
+        $this->filesystem = $filesystem;
+        $this->matcher = $matcher;
+        $this->setKeepCount($keepCount);
     }
 
     /**
@@ -113,18 +69,17 @@ class FilesystemCleaner extends Filesystem implements FilesystemCleanerInterface
      */
     public function clean()
     {
-        if ($this->keep == 0 && !$this->keepAfter) {
-            throw new MisconfiguredException("Total number of items to keep, "
-            ."or keepa fter date must be set");
-        }
-
         $files = $this->listContents();
 
         usort($files, function ($a, $b) {
             return $a['timestamp'] > $b['timestamp'] ? -1 : 1;
         });
 
+        $filIterator = new ArrayIterator($files);
+
         $cleaned = 0;
+
+        while ($this->isKeepCountReached())
 
         foreach ($files as $file) {
             if (preg_match($this->regex, $file['basename'])) {
@@ -141,57 +96,37 @@ class FilesystemCleaner extends Filesystem implements FilesystemCleanerInterface
     /**
      * {@inheritDoc}
      */
-    public function getKeep()
+    public function getKeepCount()
     {
         return $this->keep;
     }
 
     /**
-     * {@inheritDoc}
+     * Retrieve the total number of items kept afte a clean.
+     *
+     * @return int
      */
-    public function getKeepAfter()
+    public function getKept()
     {
-        return $this->keepAfter;
+        return $this->kept;
     }
 
     /**
-     * {@inheritDoc}
+     * Set the keep count.
+     *
+     * @param int $count
      */
-    public function getFileRegex()
+    private function setKeepCount($count)
     {
-        return $this->regex;
-    }
-
-    private function shouldKeep($path)
-    {
-        return $this->isLaterThanKeepAfter($path)
-            && $this->isKeepCountReached();
-    }
-
-    private function isLaterThanKeepAfter($path)
-    {
-        $result = true;
-
-        if ($this->keepAfter) {
-            if (!is_string($path)) {
-                throw new InvalidargumentException('$path should be a string');
-            }
-
-            $datetime = new DateTime('@'.$this->getTimestamp($path));
-
-            $result = $datetime > $this->keepAfter;
+        if (!is_int($count)) {
+            throw new InvalidArgumentException('$count must be an intefer');
         }
 
-        return $result;
+        $this->keepCount = $count;
     }
 
     private function isKeepCountReached()
     {
-        return $this->keep < $this->kept;
-    }
-
-    private function incrementKeptBackups()
-    {
-        $this->backupsKept+= 1;
+        return $this->keepCount && ($this->keepCount < $this->kept);
     }
 }

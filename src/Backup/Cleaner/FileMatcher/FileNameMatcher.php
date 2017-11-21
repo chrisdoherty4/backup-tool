@@ -17,12 +17,38 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Backup\Cleaner\Exception;
+namespace Backup\Cleaner\FileMatcher;
 
 /**
- * @class MisconfiguredException
+ * Matches file names against some regex string.
+ *
  * @author Chris Doherty <chris.doherty4@gmail.com>
  */
-class MisconfiguredException extends \Exception
+class FileNameMatcher implements FileMatchingInterface
 {
+    /**
+     * The regex to match file paths against.
+     *
+     * @var string
+     */
+    private $regex = '/(.*)/';
+
+    /**
+     * @param string $regex The regex to match the file name against. Should
+     *  take into consideration the possibility of a full path name.
+     */
+    public function __construct($regex)
+    {
+        $this->regex = $regex;
+    }
+
+    /**
+     * Matches against the file path.
+     *
+     * {@inheritDoc}
+     */
+    public final function matches($path)
+    {
+        return preg_match($this->regex, $path) === 1;
+    }
 }

@@ -17,19 +17,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Backup\Cleaner;
+namespace Backup\Cleaner\FileMatcher;
 
 /**
- * A cleaner for cleaning up old backups.
+ * An interface to describe a file matching object.
  *
  * @author Chris Doherty <chris.doherty4@gmail.com>
  */
-interface FilesystemCleanerInterface
+interface FileMatchingInterface
 {
     /**
-     * Performs the clean of backup files.
+     * Matches a file against the conditions created as part of the construct.
      *
-     * @return int The number of items cleaned.
+     * @param string $path The path to the file we want to match against.
+     * @return boolean True if the file matches all the conditions, else false.
      */
-    public function clean();
+    public function matches($path);
 }
