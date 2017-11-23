@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Backup\Test;
+namespace Backup\Test\Cleaner;
 
 use DateTime;
 use PHPUnit\Framework\TestCase;
@@ -50,53 +50,6 @@ class FilesystemCleanerTest extends TestCase
 
             rmdir(self::$tmpDir);
         }
-    }
-
-    public function testSetup()
-    {
-        $filecleaner = new FilesystemCleaner(new LocalAdapter(self::$tmpDir));
-
-        for ($i = 1; $i < 10; ++$i) {
-            $filecleaner->keep($i);
-            $this->assertEquals($i, $filecleaner->getKeep());
-        }
-
-        $datetime = (new DateTime())->modify('-1 day');
-        $this->assertEquals(
-            $filecleaner->keepAfter($datetime)->getKeepAfter(),
-            $datetime
-        );
-
-        $datetime->modify('-1 month');
-        $this->assertEquals(
-            $filecleaner->keepAfter($datetime)->getKeepAfter(),
-            $datetime
-        );
-    }
-
-    public function testKeepCleanCount()
-    {
-        $filecleaner = new FilesystemCleaner(new LocalAdapter(self::$tmpDir));
-
-        $datetime = new DateTime();
-
-        for ($i = 1; $i <= 4; ++$i) {
-            $this->createFile('test'.$i, $datetime->modify('-'.$i.' day'));
-        }
-
-        $filecleaner->keep(2);
-
-        $cleaned = $filecleaner->clean();
-
-        $this->assertEquals($cleaned, 2);
-
-        $files = $filecleaner->listContents();
-
-        $basenames = array_column($files, 'basename');
-
-        $this->assertCount(2, $basenames);
-        $this->assertContains('test1', $basenames);
-        $this->assertContains('test2', $basenames);
     }
 
     private function createFile($name, DateTime $created = null)

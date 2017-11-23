@@ -45,20 +45,20 @@ class CommandsServiceProvider implements ServiceProviderInterface
             );
         };
 
-        $c['Backup\Commands\Clean'] = function (Container $c) {
-            return new CleanCommand(
-                new FilesystemCleaner(
-                    new \League\Flysystem\Adapter\Ftp(
-                        [
-                        'host' => $c['config.relocate']['ftp']['host'],
-                        'username' => $c['config.relocate']['ftp']['username'],
-                        'password' => $c['config.relocate']['ftp']['password'],
-                        'port' => $c['config.relocate']['ftp']['port'],
-                        'passive' => $c['config.relocate']['ftp']['passive']
-                        ]
-                    )
-                )
-            );
-        };
+        // $c['Backup\Commands\Clean'] = function (Container $c) {
+        //     return new CleanCommand(
+        //         new FilesystemCleaner(
+        //             new \League\Flysystem\Adapter\Ftp(
+        //                 [
+        //                 'host' => $c['config.relocate']['ftp']['host'],
+        //                 'username' => $c['config.relocate']['ftp']['username'],
+        //                 'password' => $c['config.relocate']['ftp']['password'],
+        //                 'port' => $c['config.relocate']['ftp']['port'],
+        //                 'passive' => $c['config.relocate']['ftp']['passive']
+        //                 ]
+        //             )
+        //         )
+        //     );
+        // };
     }
 }
