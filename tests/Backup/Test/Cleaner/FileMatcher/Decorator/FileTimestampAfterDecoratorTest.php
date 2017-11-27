@@ -19,7 +19,9 @@
 
 namespace Backup\Test\Cleaner\FileMatcher;
 
-use Backup\Test\Mock\Filesystem;
+use DateTime;
+use PHPUnit\Framework\TestCase;
+use Backup\Test\Mock\TemporaryFilesystem as Filesystem;
 use Backup\Cleaner\FileMatcher\FileNameMatcher;
 use Backup\Cleaner\FileMatcher\Decorator\FileMatchingDecorator;
 use Backup\Cleaner\FileMatcher\Decorator\FileTimestampAfterDecorator;
@@ -28,14 +30,42 @@ use Backup\Cleaner\FileMatcher\Decorator\FileTimestampAfterDecorator;
  * FileTimestampAfterDecoratorTest
  * @author Chris Doherty <chris.doherty4@gmail.com>
  */
-class FileTimestampAfterDecoratorTest
+class FileTimestampAfterDecoratorTest extends TestCase
 {
     public function testConstruction()
     {
         $matcher = new FileTimestampAfterDecorator(
-            new FileNameMatcher(),
+            new FileNameMatcher('/(.*)/'),
             new DateTime(),
             new Filesystem()
         );
+
+        $this->assertInstanceOf(FileTimestampAfterDecorator::class, $matcher);
+    }
+
+    public function testMatchTimestamps()
+    {
+        $filesystem = new Filesystem();
+        $datetime = new DateTime();
+
+        $matcher = new FileTimestampAfterDecorator(
+            new FileNameMatcher('/(.*)/'),
+            $datetime->sub('-1 day'),
+            $filesystem
+        );
+
+        $filesystem->write(
+            'test1',
+            '',
+            ['timestamp' => $datetime->format('U')]
+        );
+
+        $filesystem->write(
+            'test2',
+            '',
+            ['timestamp' => $datetime->sub('-1 week')->format('U')]
+        );
+
+        $this->assertTrue($matcher->matches('test1'));
     }
 }

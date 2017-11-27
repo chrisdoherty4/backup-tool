@@ -17,34 +17,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Backup\Test\Cleaner\FileMatcher;
+namespace Backup\Test\Mock;
 
-use League\Flysystem\Filesystem as BaseFilesystem;
-use League\Fysystem\Adapter\Local as LocalAdapter;
+use League\Flysystem\Filesystem;
+use League\Fysystem\Memory\MemoryAdapter;
 
 /**
- * Filesystem
+ * TemporaryFilesystem
  * @author Chris Doherty <chris.doherty4@gmail.com>
  */
-class Filesystem extends BaseFilesystem
+class TemporaryFilesystem extends Filesystem
 {
     public function __construct()
     {
-        mkdir(__DIR__.'/tmp');
-        parent::__construct(new LocalAdapter(__DIR__.'/tmp'));
+        parent::__construct(new MemoryAdapter());
     }
 
     public function __destruct()
     {
-        foreach(array_diff(scandir(__DIR__.'/tmp'), ['.', '..']) as $f) {
-            unlink(__DIR__.'/'.$f);
-        }
-    }
-
-    public function populate($num = 5, $timestamp = 'now')
-    {
-        for ($i = 0; $i < $num; ++$i) {
-            $this->write('test'.$i, '');
+        foreach($this->listContents() as $f) {
+            $this->delete($f);
         }
     }
 }

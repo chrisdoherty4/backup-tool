@@ -26,41 +26,8 @@ use League\Flysystem\Adapter\Local as LocalAdapter;
 
 class FilesystemCleanerTest extends TestCase
 {
-    private static $tmpDir = __DIR__.'/tmp';
-
-    /**
-     * Create a directory for files so we can test things.
-     */
-    public static function setUpBeforeClass()
+    public function testConstruction()
     {
-        if (!is_dir(self::$tmpDir)) {
-            mkdir(self::$tmpDir);
-        }
-    }
-
-    /**
-     * Clean up the directory used for testing things.
-     */
-    public static function tearDownAfterClass()
-    {
-        if (is_dir(self::$tmpDir)) {
-            foreach (array_diff(scandir(self::$tmpDir), ['.','..']) as $file) {
-                unlink(self::$tmpDir.'/'.$file);
-            }
-
-            rmdir(self::$tmpDir);
-        }
-    }
-
-    private function createFile($name, DateTime $created = null)
-    {
-        if (!$created) {
-            $created =  new DateTime();
-        }
-
-        $file = self::$tmpDir.'/'.$name;
-
-        file_put_contents($file, '');
-        touch($file, $created->getTimestamp());
+        $this->markTestIncomplete();
     }
 }
