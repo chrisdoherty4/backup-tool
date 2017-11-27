@@ -19,14 +19,15 @@
 
 namespace Backup\Test\Cleaner\FileMatcher;
 
+use PHPUnit\Framework\TestCase;
 use Backup\Cleaner\FileMatcher\FileNameMatcher;
-use Backup\Cleaner\FileMatcher\FileMatcherInterface;
+use Backup\Cleaner\FileMatcher\FileMatchingInterface;
 
 /**
  * FileNameMatcherTest
  * @author Chris Doherty <chris.doherty4@gmail.com>
  */
-class FileNameMatcherTest
+class FileNameMatcherTest extends TestCase
 {
     public function testConstruction()
     {
@@ -34,24 +35,29 @@ class FileNameMatcherTest
 
         $this->assertInstanceOf(FileNameMatcher::class, $fileNameMatcher);
 
-        $this->assertInstanceOf(
-            FileNameMatcherInterface::class,
-            $fileNameMatcher
-        );
+        $this->assertTrue($fileNameMatcher instanceof FileMatchingInterface);
     }
 
     public function testMatches()
     {
         $fileNameMatcher = new FileNameMatcher('/(.*)/');
 
-        $this->assertTrue($fileNameMatcher->matches(''));
+        $random = 'abcdefghijklmnopqrstuvwxyz0123456789!£$%^&*()@:}{}<>';
+
+        for ($i = 0; $i < 100; ++$i) {
+            $this->assertTrue($fileNameMatcher->matches(
+                substr(str_shuffle($random), 0, rand(5, strlen($random)))
+            ));
+        }
 
         $fileNameMatcher = new FileNameMatcher('/(test)/');
 
         $this->assertTrue($fileNameMatcher->matches('test'));
 
-        $this->assertFalse($fileNameMatcher->matches(''));
-
-        $this->assertFalse($fileNameMatcher->matches('random'));
+        for ($i = 0; $i < 100; ++$i) {
+            $this->assertFalse($fileNameMatcher->matches(
+                substr(str_shuffle($random), 0, rand(5, strlen($random)))
+            ));
+        }
     }
 }
