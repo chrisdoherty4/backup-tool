@@ -21,6 +21,7 @@ namespace Backup\Cleaner\FileMatcher\Decorator;
 
 use DateTime;
 use League\Flysystem\FilesystemInterface;
+use Backup\Cleaner\FileMatcher\FileMatchingInterface;
 
 /**
  * Matches file names against some regex string.
@@ -44,14 +45,14 @@ class FileTimestampAfterDecorator extends FileMatchingDecorator
     private $filesystem = null;
 
     /**
-     * @param MatcherInterface $matcher The next matcher to call.
-     * @param string $regex The regex to match the file name against. Should
-     *  take into consideration the possibility of a full path name.
-     * @param FilesystemInterface $filesystem The file system where the
-     *  file will reside.
+     * @param FileMatchingInterface $matcher The file matcher to use next in
+     *  the sequence.
+     * @param DateTime $after The date-time to ensure files are created after.
+     * @param FilesystemInterface $filesystem The filesystem we're interfacing
+     *  with.
      */
     public function __construct(
-        MatcherInterface $matcher,
+        FileMatchingInterface $matcher,
         DateTime $after,
         FilesystemInterface $filesystem
     ) {

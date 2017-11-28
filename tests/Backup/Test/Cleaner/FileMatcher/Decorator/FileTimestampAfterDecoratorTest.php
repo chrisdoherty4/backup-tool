@@ -17,14 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Backup\Test\Cleaner\FileMatcher;
+namespace Backup\Test\Cleaner\FileMatcher\Decorator;
 
 use DateTime;
+use DateInterval;
 use PHPUnit\Framework\TestCase;
-use Backup\Test\Mock\TemporaryFilesystem as Filesystem;
 use Backup\Cleaner\FileMatcher\FileNameMatcher;
 use Backup\Cleaner\FileMatcher\Decorator\FileMatchingDecorator;
 use Backup\Cleaner\FileMatcher\Decorator\FileTimestampAfterDecorator;
+use League\Flysystem\Filesystem;
+use League\Flysystem\Memory\MemoryAdapter;
 
 /**
  * FileTimestampAfterDecoratorTest
@@ -37,7 +39,7 @@ class FileTimestampAfterDecoratorTest extends TestCase
         $matcher = new FileTimestampAfterDecorator(
             new FileNameMatcher('/(.*)/'),
             new DateTime(),
-            new Filesystem()
+            new Filesystem(new MemoryAdapter())
         );
 
         $this->assertInstanceOf(FileTimestampAfterDecorator::class, $matcher);
@@ -45,27 +47,32 @@ class FileTimestampAfterDecoratorTest extends TestCase
 
     public function testMatchTimestamps()
     {
-        $filesystem = new Filesystem();
+        $filesystem = new Filesystem(new MemoryAdapter());
         $datetime = new DateTime();
 
         $matcher = new FileTimestampAfterDecorator(
             new FileNameMatcher('/(.*)/'),
-            $datetime->sub('-1 day'),
+            $datetime->sub(new DateInterval('P1D')),
             $filesystem
         );
 
         $filesystem->write(
             'test1',
-            '',
+            'test1',
             ['timestamp' => $datetime->format('U')]
         );
 
         $filesystem->write(
             'test2',
-            '',
-            ['timestamp' => $datetime->sub('-1 week')->format('U')]
+            'test2',
+            [
+                'timestamp' => $datetime->sub(
+                    new DateInterval('P2D')
+                )->format('U')
+            ]
         );
 
         $this->assertTrue($matcher->matches('test1'));
+        $this->assertFalse($matcher->matches('test2'));
     }
 }

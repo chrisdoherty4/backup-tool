@@ -19,7 +19,8 @@
 
 namespace Backup\Cleaner\FileMatcher;
 
-use FileNameMatcher;
+use DateTime;
+use Backup\Cleaner\FileMatcher\FileNameMatcher;
 use Backup\Cleaner\FileMatcher\Decorator\FileTimestampAfterDecorator;
 use League\Flysystem\FilesystemInterface;
 
@@ -48,6 +49,8 @@ class Builder
      * will ensure the file was created after the specified date and time.
      *
      * @param DateTime $keepAfter The datetime to match against.
+     * @param FilesystemInterface A filesystem to pass to the
+     *  FileTimestampAfterDecorator.
      */
     public function setFileTimestampAfter(
         DateTime $keepAfter,
@@ -56,7 +59,7 @@ class Builder
         $this->matcher = new FileTimestampAfterDecorator(
             $this->matcher,
             $keepAfter,
-            $filessytem
+            $filesystem
         );
     }
 

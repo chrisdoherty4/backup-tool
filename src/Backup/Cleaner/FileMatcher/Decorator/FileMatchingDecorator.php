@@ -41,7 +41,7 @@ abstract class FileMatchingDecorator implements FileMatchingInterface
      *
      * @param MatcherInterface $matcher The next matcher.
      */
-    public function __construct(MatcherInterface $matcher)
+    public function __construct(FileMatchingInterface $matcher)
     {
         $this->matcher = $matcher;
     }
