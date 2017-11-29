@@ -1,6 +1,6 @@
 <?php
 
-/* 
+/*
  * Copyright (C) 2017 Chris Doherty
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,9 +19,9 @@
 
 namespace Backup\Providers;
 
-use \Pimple\ServiceProviderInterface;
-use \Pimple\Container;
-use \Backup\FileSystem\MountManager;
+use Pimple\ServiceProviderInterface;
+use Pimple\Container;
+use Backup\Filesystem\MountManager;
 
 /**
  * @class FileSystemServiceProvider
@@ -34,7 +34,7 @@ class FileSystemServiceProvider implements ServiceProviderInterface
         $c['filesystem.mount_manager'] = function (Container $c) {
             return new MountManager($c);
         };
-        
+
         $c['filesystem.ftp'] = function (Container $c) {
             return $c['filesystem.mount_manager']
                 ->getFtpInstance($c['config.relocate']['ftp']);

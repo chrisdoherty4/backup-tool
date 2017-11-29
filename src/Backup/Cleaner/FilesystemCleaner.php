@@ -78,7 +78,7 @@ class FilesystemCleaner implements FilesystemCleanerInterface
 
         $cleaned = 0;
 
-        while ($this->isKeepCountReached()) {
+        while (!$this->isKeepCountReached()) {
             foreach ($files as $file) {
                 if (preg_match($this->regex, $file['basename'])) {
                     if (!$this->shouldKeep($file['path'])) {
