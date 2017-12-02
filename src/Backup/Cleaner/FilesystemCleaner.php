@@ -25,6 +25,7 @@ use DateTimeZone;
 use InvalidArgumentException;
 use ArrayIterator;
 use League\Flysystem\FilesystemInterface;
+use Backup\Cleaner\FileMatcher\FileMatchingInterface;
 
 /**
  * @class Cleanup
@@ -53,7 +54,7 @@ class FilesystemCleaner implements FilesystemCleanerInterface
 
     public function __construct(
         FilesystemInterface $filesystem,
-        FileMatcherInterface $matcher,
+        FileMatchingInterface $matcher,
         $keepCount
     ) {
         $this->filesystem = $filesystem;
@@ -69,24 +70,24 @@ class FilesystemCleaner implements FilesystemCleanerInterface
      */
     public function clean()
     {
-        $files = $this->listContents();
+        $iterator = new ArrayIterator($this->filesystem->listContents());
 
-        usort($files, function ($a, $b) {
+        $iterator->uasort(function ($a, $b) {
             return $a['timestamp'] > $b['timestamp'] ? -1 : 1;
         });
 
-        $filIterator = new ArrayIterator($files);
-
         $cleaned = 0;
 
-        while ($this->isKeepCountReached())
+        if ($iterator->count() > 0) {
+            while (!$this->isKeepCountReached() && $iterator->valid()) {
+                $file = $iterator->current();
 
-        foreach ($files as $file) {
-            if (preg_match($this->regex, $file['basename'])) {
-                if (!$this->shouldKeep($file['path'])) {
-                    $this->delete($file['path']);
-                    $cleaned+= 1;
+                if ($this->matcher->matches($file['path'])) {
+                    $this->filesystem->delete($file['path']);
+                    $cleaned++;
                 }
+
+                $iterator->next();
             }
         }
 
