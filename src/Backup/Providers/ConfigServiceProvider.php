@@ -1,6 +1,6 @@
 <?php
 
-/* 
+/*
  * Copyright (C) 2017 Chris Doherty
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,9 +19,9 @@
 
 namespace Backup\Providers;
 
-use \Pimple\ServiceProviderInterface;
-use \Pimple\Container;
-use \PHLAK\Config\Config;
+use Pimple\ServiceProviderInterface;
+use Pimple\Container;
+use PHLAK\Config\Config;
 
 /**
  * @class ConfigServiceProvider
@@ -34,10 +34,10 @@ class ConfigServiceProvider implements ServiceProviderInterface
         // Read all configuration files.
         $configPath = config_path();
         $files = array_diff(scandir($configPath), ['.', '..']);
-        
+
         foreach ($files as $file) {
             $fileName = substr($file, 0, strrpos($file, '.'));
-            
+
             $c['config.'.$fileName] = function (Container $c) use (
                 $file,
                 $configPath

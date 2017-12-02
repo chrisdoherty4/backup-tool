@@ -19,10 +19,10 @@
 
 namespace Backup\Providers;
 
-use \Pimple\ServiceProviderInterface;
-use \Pimple\Container;
-use \Backup\Commands\CPanelBackup as CPanelBackupCommand;
-use \Backup\Commands\Relocate as RelocateCommand;
+use Pimple\ServiceProviderInterface;
+use Pimple\Container;
+use Backup\Commands\CPanelBackup as CPanelBackupCommand;
+use Backup\Commands\Relocate as RelocateCommand;
 use Backup\Commands\Clean as CleanCommand;
 use Backup\Cleaner\FilesystemCleaner;
 

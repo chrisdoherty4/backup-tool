@@ -19,7 +19,6 @@
 
 namespace Backup\Cleaner;
 
-
 use DateTime;
 use DateTimeZone;
 use InvalidArgumentException;

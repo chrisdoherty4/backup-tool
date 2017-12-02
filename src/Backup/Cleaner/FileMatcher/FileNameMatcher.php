@@ -47,7 +47,7 @@ class FileNameMatcher implements FileMatchingInterface
      *
      * {@inheritDoc}
      */
-    public final function matches($path)
+    final public function matches($path)
     {
         return preg_match($this->regex, $path) === 1;
     }
