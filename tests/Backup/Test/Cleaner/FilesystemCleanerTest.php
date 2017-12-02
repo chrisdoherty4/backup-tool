@@ -22,12 +22,24 @@ namespace Backup\Test\Cleaner;
 use DateTime;
 use PHPUnit\Framework\TestCase;
 use Backup\Cleaner\FilesystemCleaner;
-use League\Flysystem\Adapter\Local as LocalAdapter;
+use Backup\Cleaner\FileMatcher\FileNameMatcher;
+use League\Flysystem\Filesystem;
+use League\Flysystem\Memory\MemoryAdapter;
 
 class FilesystemCleanerTest extends TestCase
 {
     public function testConstruction()
     {
-        $this->markTestIncomplete();
+        $filesystem = new Filesystem(new MemoryAdapter());
+
+        $cleaner = new FilesystemCleaner(
+            $filesystem,
+            new FileNameMatcher('#(.*)#'),
+            1
+        );
+
+        $filesystem->write('test1', 'test1');
+
+        $cleaner->clean();
     }
 }
