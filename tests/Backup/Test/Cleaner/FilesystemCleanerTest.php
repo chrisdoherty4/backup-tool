@@ -23,6 +23,7 @@ use DateTime;
 use PHPUnit\Framework\TestCase;
 use Backup\Cleaner\FilesystemCleaner;
 use Backup\Cleaner\FileMatcher\FileNameMatcher;
+use Backup\Cleaner\FilesystemCleanerInterface;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Memory\MemoryAdapter;
 
@@ -38,8 +39,34 @@ class FilesystemCleanerTest extends TestCase
             1
         );
 
-        $filesystem->write('test1', 'test1');
+        $this->assertInstanceOf(FilesystemCleaner::class, $cleaner);
+        $this->assertInstanceOf(FilesystemCleanerInterface::class, $cleaner);
 
-        $cleaner->clean();
+        $this->assertEquals($cleaner->getKeepCount(), 1);
+    }
+
+    public function testClean()
+    {
+        $filesystem = new Filesystem(new MemoryAdapter());
+
+        $cleaner = new FilesystemCleaner(
+            $filesystem,
+            new FileNameMatcher('#^matching[0-9]{1,2}$#'),
+            10
+        );
+
+        for ($i = 0; $i < 10; $i++) {
+            $filesystem->write('matching'.$i, 'matching');
+        }
+
+        for ($i = 0; $i < 5; $i++) {
+            $filesystem->write('nonmatching'.$i, 'nonmatching');
+        }
+
+        $cleaned = $cleaner->clean();
+
+        $this->assertEquals(10, $cleaned, 'Cleaned count wrong');
+
+        $this->assertEquals(5, $cleaner->getKept(), 'Kept count wrong');
     }
 }

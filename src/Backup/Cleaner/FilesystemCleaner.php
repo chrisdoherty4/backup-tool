@@ -27,7 +27,7 @@ use League\Flysystem\FilesystemInterface;
 use Backup\Cleaner\FileMatcher\FileMatchingInterface;
 
 /**
- * @class Cleanup
+ * @class FilesystemCleaner
  * @author Chris Doherty <chris.doherty4@gmail.com>
  */
 class FilesystemCleaner implements FilesystemCleanerInterface
@@ -43,7 +43,7 @@ class FilesystemCleaner implements FilesystemCleanerInterface
      * The uper limit of backups to keep.
      * @var int
      */
-    private $keepCount = null;
+    private $keepCount = 1;
 
     /**
      * The numebr of backups kept.
@@ -77,17 +77,14 @@ class FilesystemCleaner implements FilesystemCleanerInterface
 
         $cleaned = 0;
 
-        if ($iterator->count() > 0) {
-            while (!$this->isKeepCountReached() && $iterator->valid()) {
-                $file = $iterator->current();
+        while ($iterator->valid()) {
+            $file = $iterator->current();
 
-                if ($this->matcher->matches($file['path'])) {
-                    $this->filesystem->delete($file['path']);
-                    $cleaned++;
-                }
-
-                $iterator->next();
+            if ($this->cleanFile($file)) {
+                $cleaned+= 1;
             }
+
+            $iterator->next();
         }
 
         return $cleaned;
@@ -98,7 +95,7 @@ class FilesystemCleaner implements FilesystemCleanerInterface
      */
     public function getKeepCount()
     {
-        return $this->keep;
+        return $this->keepCount;
     }
 
     /**
@@ -118,15 +115,31 @@ class FilesystemCleaner implements FilesystemCleanerInterface
      */
     private function setKeepCount($count)
     {
-        if (!is_int($count)) {
-            throw new InvalidArgumentException('$count must be an intefer');
+        if (!is_int($count) || $count < 1) {
+            throw new InvalidArgumentException('$count must be an integer and greater than 0');
         }
 
         $this->keepCount = $count;
     }
 
-    private function isKeepCountReached()
+    /**
+     * Evaluates if a file should be cleaned and cleans it.
+     *
+     * @param array $file An array containing the 'path' element.
+     * @return boolean True if we clean it else false.
+     */
+    private function cleanFile(array $file)
     {
-        return $this->keepCount && ($this->keepCount < $this->kept);
+        $result = true;
+
+        if (($this->keepCount < $this->kept)
+            || $this->matcher->matches($file['path'])) {
+            $this->filesystem->delete($file['path']);
+        } else {
+            $this->kept+= 1;
+            $result = false;
+        }
+
+        return $result;
     }
 }
